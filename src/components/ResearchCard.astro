@@ -1,0 +1,4 @@
+---
+interface Props { english:string; chinese:string; description:string; index:number } const {english,chinese,description,index}=Astro.props;
+---
+<article class="research-card" data-reveal style={`--delay:${index*70}ms`}><div class="card-index">0{index+1}</div><div class="motif"></div><h3>{chinese}</h3><p class="english-title">{english}</p><p>{description}</p><span>Research area</span></article>
