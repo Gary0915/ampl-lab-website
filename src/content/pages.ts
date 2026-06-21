@@ -8,7 +8,7 @@ export const pageIntro: Localized<Record<Route, {title:string; description:strin
   },
 };
 export const aboutCopy: Localized<{profile:string; philosophy:string; mission:string}> = {
-  'zh-Hant':{profile:'尖端材料及製程實驗室隸屬國立成功大學機械工程學系。研究以綠色合成、資源循環、奈米與生質複合材料、表面工程及模擬輔助設計為核心。',philosophy:'我們相信材料研究應同時理解來源、結構、界面、製程與最終應用。透過實驗與模擬相互驗證，建立可回應環境、生醫、感測與工程需求的材料判斷。',mission:'從農漁業副產物到功能材料，從微觀行為到工程應用，AMPl 致力於建立更具資源意識與設計依據的材料與製程研究。'},
+  'zh-Hant':{profile:'尖端材料及製程實驗室隸屬國立成功大學機械工程學系。研究以綠色合成、資源循環、奈米與生質複合材料、表面工程及模擬輔助設計為核心。',philosophy:'我們相信材料研究應同時理解來源、結構、界面、製程與最終應用。透過實驗與模擬相互驗證，建立可回應環境、生醫、感測與工程需求的材料判斷。',mission:'從農漁業副產物到功能材料，從微觀行為到工程應用，AMPL 致力於建立更具資源意識與設計依據的材料與製程研究。'},
   en:{profile:'The Advanced Material and Processing Lab is part of the Department of Mechanical Engineering at National Cheng Kung University. Its research centres on green synthesis, circular resources, nano and biopolymer composites, surface engineering, and simulation-assisted design.',philosophy:'We believe materials research should connect source, structure, interface, processing, and eventual use. Experiments and simulation are brought together to inform materials for environmental, biomedical, sensing, and engineering contexts.',mission:'From agricultural and fishery by-products to functional materials, and from microscopic behaviour to engineering use, AMPL develops more resource-aware and evidence-based material and process research.'}
 };
 export const joinCopy: Localized<{lead:string; audiences:string[]; topics:string[]; skills:string[]; contact:string}> = {

@@ -11,7 +11,8 @@ const timer = setInterval(() => {
   http.get('http://127.0.0.1:4321/', (response) => {
     response.resume();
     clearInterval(timer);
-    const runner = spawn('npx.cmd', ['playwright', 'test', ...process.argv.slice(2)], { stdio: 'inherit', shell: true });
+    const npxCommand = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+    const runner = spawn(npxCommand, ['playwright', 'test', ...process.argv.slice(2)], { stdio: 'inherit', shell: true });
     runner.on('exit', (code) => {
       server.kill();
       process.exit(code ?? 1);

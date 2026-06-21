@@ -1,4 +1,4 @@
 ---
 import PendingInformationCard from './PendingInformationCard.astro'; import { pending } from '../content/pending'; import type { Locale } from '../content/site'; interface Props {lang:Locale} const {lang}=Astro.props;
 ---
-<div class="publication-shell" data-reveal><div class="publication-filter" aria-label="Publication filters"><span>{lang==='zh-Hant'?'全部年份':'All years'}</span><span>{lang==='zh-Hant'?'全部主題':'All topics'}</span><span>{lang==='zh-Hant'?'搜尋書目':'Search records'}</span></div><PendingInformationCard lang={lang} item={pending.publications}/></div>
+<div class="publication-shell" data-reveal><div class="publication-future"><span>{lang==='zh-Hant'?'未來資料欄位：年份、主題與書目搜尋':'Future record fields: year, topic, and bibliographic search'}</span></div><PendingInformationCard lang={lang} item={pending.publications}/></div>
