@@ -27,6 +27,25 @@ test('information pages use formal pending states instead of raw markers', async
   }
 });
 
+test('Contact page presents verified office details and external official links', async ({ page }) => {
+  await page.goto('/contact');
+  await expect(page.locator('main')).toContainText('7樓720室');
+  await expect(page.locator('main')).toContainText('10樓A06室');
+  await expect(page.locator('main')).toContainText('9樓908B室');
+  await expect(page.locator('main')).toContainText('62176');
+  await expect(page.locator('main')).toContainText('62159-72');
+  await expect(page.getByRole('link', { name: /官方校園地圖/i })).toHaveAttribute('href', 'https://nckumap.ncku.edu.tw/map.php');
+});
+
+test('public pages do not expose internal pending markers', async ({ page }) => {
+  for (const path of ['/', '/about', '/research', '/members', '/publications', '/facilities', '/news', '/join-us', '/contact', '/en/', '/en/about', '/en/research', '/en/members', '/en/publications', '/en/facilities', '/en/news', '/en/join-us', '/en/contact']) {
+    await page.goto(path);
+    await expect(page.locator('main')).not.toContainText('待提供：');
+    await expect(page.locator('main')).not.toContainText('待確認：');
+    await expect(page.locator('main')).not.toContainText('[Pending]');
+  }
+});
+
 test('all Chinese and English routes expose a visible page heading', async ({ page }) => {
   for (const path of ['/', '/about', '/research', '/members', '/publications', '/facilities', '/news', '/join-us', '/contact', '/en/', '/en/about', '/en/research', '/en/members', '/en/publications', '/en/facilities', '/en/news', '/en/join-us', '/en/contact']) {
     await page.goto(path);

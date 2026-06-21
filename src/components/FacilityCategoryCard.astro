@@ -1,4 +1,15 @@
 ---
-interface Props { title:string; description:string; motif:string; index:number } const {title,description,motif,index}=Astro.props;
+import type { Locale } from '../content/site';
+
+interface Props { title: string; description: string; motif: string; index: number; lang: Locale }
+const { title, description, motif, index, lang } = Astro.props;
+const verificationLabel = lang === 'zh-Hant' ? '設備資訊確認中' : 'Information pending verification';
 ---
-<article class={`facility-card motif-${motif}`} data-reveal><span>0{index+1}</span><div class="facility-motif" aria-hidden="true"></div><h3>{title}</h3><p>{description}</p><small>Information pending verification</small></article>
+
+<article class={`facility-card motif-${motif}`} data-reveal>
+  <span>0{index + 1}</span>
+  <div class="facility-motif" aria-hidden="true"></div>
+  <h3>{title}</h3>
+  <p>{description}</p>
+  <small>{verificationLabel}</small>
+</article>
