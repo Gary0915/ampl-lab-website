@@ -12,6 +12,21 @@ test('reduced motion removes continuous animation', async ({ page }) => {
   await expect(page.locator('.lattice-node').first()).toHaveCSS('animation-name', 'none');
 });
 
+test('English research page has English-only research descriptions', async ({ page }) => {
+  await page.goto('/en/research');
+  await expect(page.getByText('Green Synthesis & Circular Economy')).toBeVisible();
+  await expect(page.locator('main')).not.toContainText('綠色合成與循環經濟');
+});
+
+test('information pages use formal pending states instead of raw markers', async ({ page }) => {
+  for (const path of ['/members', '/publications', '/facilities', '/news']) {
+    await page.goto(path);
+    await expect(page.locator('main')).not.toContainText('[待提供');
+    await expect(page.locator('main')).not.toContainText('[待確認');
+    await expect(page.locator('main')).not.toContainText('[Pending');
+  }
+});
+
 test('all Chinese and English routes expose a visible page heading', async ({ page }) => {
   for (const path of ['/', '/about', '/research', '/members', '/publications', '/facilities', '/news', '/join-us', '/contact', '/en/', '/en/about', '/en/research', '/en/members', '/en/publications', '/en/facilities', '/en/news', '/en/join-us', '/en/contact']) {
     await page.goto(path);
