@@ -62,6 +62,28 @@ test('mobile navigation opens accessibly', async ({ page }) => {
   await expect(page.locator('#mobile-navigation')).toBeVisible();
 });
 
+test('Research cards use a calm responsive grid and retain at most three tags', async ({ page }) => {
+  for (const [width, expectedColumns] of [[1440, 3], [1280, 2], [1024, 2], [768, 2], [430, 1], [390, 1]] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/research');
+    const columnCount = await page.locator('.page-content .research-grid').evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length);
+    expect(columnCount).toBe(expectedColumns);
+    const sizes = await page.locator('html').evaluate((element) => ({ scrollWidth: element.scrollWidth, clientWidth: element.clientWidth }));
+    expect(sizes.scrollWidth).toBeLessThanOrEqual(sizes.clientWidth);
+    const tagCounts = await page.locator('.research-card').evaluateAll((cards) => cards.map((card) => card.querySelectorAll('.tag-list span').length));
+    expect(tagCounts).toEqual([3, 3, 3, 3, 3, 3]);
+  }
+});
+
+test('Research card descriptions remain concise in both locales', async ({ page }) => {
+  for (const path of ['/research', '/en/research']) {
+    await page.goto(path);
+    const lengths = await page.locator('.research-card > p').evaluateAll((items) => items.map((item) => item.textContent?.trim().length ?? 0));
+    expect(lengths).toHaveLength(6);
+    expect(Math.max(...lengths)).toBeLessThan(155);
+  }
+});
+
 for (const width of [1440, 1280, 1024, 768, 430, 390, 360]) {
   test(`home has no horizontal overflow at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
