@@ -3,6 +3,9 @@ import { test } from '@playwright/test';
 const captures = [
   ['/', 'home-desktop', { width: 1440, height: 1000 }],
   ['/research', 'research-desktop', { width: 1280, height: 1000 }],
+  ['/research', 'research-wide-desktop', { width: 1440, height: 1000 }],
+  ['/research', 'research-tablet', { width: 1024, height: 1000 }],
+  ['/research', 'research-mobile', { width: 390, height: 844 }],
   ['/about', 'about-professor-desktop', { width: 1280, height: 1000 }],
   ['/publications', 'publications-desktop', { width: 1280, height: 1000 }],
   ['/facilities', 'facilities-desktop', { width: 1280, height: 1000 }],
@@ -15,6 +18,7 @@ const captures = [
 for (const [path, name, viewport] of captures) {
   test(`capture ${name}`, async ({ page }) => {
     await page.setViewportSize(viewport);
+    if (name.startsWith('research')) await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(path);
     await page.screenshot({ path: `artifacts/qa/${name}.png`, fullPage: true });
   });
