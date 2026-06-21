@@ -1,4 +1,20 @@
 ---
-import PendingInformationCard from './PendingInformationCard.astro'; import { pending } from '../content/pending'; import type { Locale } from '../content/site'; interface Props {lang:Locale} const {lang}=Astro.props;
+import PendingInformationCard from './PendingInformationCard.astro';
+import { pending } from '../content/pending';
+import { lab, type Locale } from '../content/site';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const zh = lang === 'zh-Hant';
 ---
-<div class="publication-shell" data-reveal><div class="publication-future"><span>{lang==='zh-Hant'?'未來資料欄位：年份、主題與書目搜尋':'Future record fields: year, topic, and bibliographic search'}</span></div><PendingInformationCard lang={lang} item={pending.publications}/></div>
+
+<div class="publication-shell" data-reveal>
+  <div class="publication-future">
+    <span>{zh ? '完整書目將以已核實的年份、主題與出版資訊呈現。' : 'Verified bibliographic records will be presented with year, topic, and publication details.'}</span>
+  </div>
+  <div class="publication-links">
+    <a href={lab.facultyProfileUrl} target="_blank" rel="noreferrer">{zh ? '成大機械系教師頁' : 'Official NCKU faculty profile'} <span aria-hidden="true">↗</span></a>
+    <a href={lab.personalWebsiteUrl} target="_blank" rel="noreferrer">{zh ? '教授個人網站' : 'Professor website'} <span aria-hidden="true">↗</span></a>
+  </div>
+  <PendingInformationCard lang={lang} item={pending.publications}/>
+</div>

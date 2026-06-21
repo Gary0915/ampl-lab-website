@@ -1,0 +1,23 @@
+---
+import { lab, type Locale } from '../content/site';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const zh = lang === 'zh-Hant';
+const cards = [
+  { title: zh ? '學歷' : 'Education', items: lab.education[lang] },
+  { title: zh ? '簡要經歷' : 'Selected Experience', items: lab.selectedExperience[lang] },
+  { title: zh ? '研究專長' : 'Research Expertise', items: lab.researchExpertise[lang] },
+];
+---
+
+<div class="profile-grid">
+  {cards.map((card) => (
+    <article class="profile-card">
+      <h3>{card.title}</h3>
+      <ul>
+        {card.items.map((item) => <li>{item}</li>)}
+      </ul>
+    </article>
+  ))}
+</div>

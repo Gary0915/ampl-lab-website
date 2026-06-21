@@ -1,15 +1,107 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro'; import PageHero from '../components/PageHero.astro'; import SectionHeading from '../components/SectionHeading.astro'; import PrincipalInvestigatorCard from '../components/PrincipalInvestigatorCard.astro'; import PendingInformationCard from '../components/PendingInformationCard.astro'; import PublicationPlaceholder from '../components/PublicationPlaceholder.astro'; import FacilityCategoryCard from '../components/FacilityCategoryCard.astro'; import NewsCategoryCard from '../components/NewsCategoryCard.astro'; import ResearchCard from '../components/ResearchCard.astro'; import Pipeline from '../components/Pipeline.astro'; import {routes,type Route,labels,lab} from '../content/site'; import {pageIntro,aboutCopy,joinCopy} from '../content/pages'; import {pending} from '../content/pending'; import {researchAreas} from '../content/research'; import {facilityCategories} from '../content/facilities'; import {newsCategories} from '../content/news';
-const lang='zh-Hant' as const; const page=Astro.params.page as Route; if(!routes.includes(page)) return new Response(null,{status:404}); const intro=pageIntro[lang][page]; const about=aboutCopy[lang]; const join=joinCopy[lang];
-export function getStaticPaths() { return routes.map((page) => ({ params: { page } })); }
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import PrincipalInvestigatorCard from '../components/PrincipalInvestigatorCard.astro';
+import ProfessorProfile from '../components/ProfessorProfile.astro';
+import MethodsApplications from '../components/MethodsApplications.astro';
+import PendingInformationCard from '../components/PendingInformationCard.astro';
+import PublicationPlaceholder from '../components/PublicationPlaceholder.astro';
+import FacilityCategoryCard from '../components/FacilityCategoryCard.astro';
+import NewsCategoryCard from '../components/NewsCategoryCard.astro';
+import ResearchCard from '../components/ResearchCard.astro';
+import Pipeline from '../components/Pipeline.astro';
+import { routes, type Route, labels, lab } from '../content/site';
+import { pageIntro, aboutCopy, joinCopy } from '../content/pages';
+import { pending } from '../content/pending';
+import { researchAreas } from '../content/research';
+import { facilityCategories } from '../content/facilities';
+import { newsCategories } from '../content/news';
+
+const lang = 'zh-Hant' as const;
+const page = Astro.params.page as Route;
+if (!routes.includes(page)) return new Response(null, { status: 404 });
+const intro = pageIntro[lang][page];
+const about = aboutCopy[lang];
+const join = joinCopy[lang];
+
+export function getStaticPaths() {
+  return routes.map((page) => ({ params: { page } }));
+}
 ---
-<BaseLayout title={labels[lang][page]} lang={lang}><PageHero eyebrow={`AMPL · ${labels.en[page]}`} title={intro.title} description={intro.description} secondary={page==='about'?lab.englishName:undefined}/><section class="page-content">
-{page==='about' && <><SectionHeading eyebrow="Lab profile" title="實驗室簡介" description={about.profile}/><PrincipalInvestigatorCard lang={lang}/><div class="prose-grid"><article><h2>研究理念</h2><p>{about.philosophy}</p></article><article><h2>研究使命</h2><p>{about.mission}</p></article></div></>}
-{page==='research' && <><SectionHeading eyebrow="Six connected areas" title="從資源到應用的材料研究" description="六個研究主題由共同的材料與製程邏輯串連。"/><div class="research-grid">{researchAreas.map((area,index)=><ResearchCard title={area.title[lang]} description={area.description[lang]} tags={area.tags[lang]} motif={area.motif} {index}/>)}</div><SectionHeading eyebrow="AMPL pathway" title="研究流程" description="實驗觀察與模擬分析共同支持材料與製程判斷。"/><Pipeline lang={lang}/></>}
-{page==='members' && <><SectionHeading eyebrow="Principal investigator" title="主持教授" description="以可確認的正式資料呈現實驗室研究領導與聯絡方式。"/><PrincipalInvestigatorCard lang={lang}/><div class="pending-grid"><PendingInformationCard lang={lang} item={pending.members}/><PendingInformationCard lang={lang} item={pending.alumni}/></div></>}
-{page==='publications' && <><SectionHeading eyebrow="Research records" title="代表性出版品" description="出版品清單將以經確認的書目紀錄正式更新。"/><PublicationPlaceholder lang={lang}/></>}
-{page==='facilities' && <><SectionHeading eyebrow="Research capability categories" title="實驗設施類別" description="依研究流程呈現設施能力範圍；設備細節與照片將於確認後補充。"/><div class="facility-grid">{facilityCategories[lang].map((item,index)=><FacilityCategoryCard {...item} {index}/>)}</div><PendingInformationCard lang={lang} item={pending.facility}/></>}
-{page==='news' && <><SectionHeading eyebrow="Formal updates" title="消息分類" description="本站預留正式發布研究與活動訊息的版面，不以虛構內容填補。"/><div class="news-grid">{newsCategories[lang].map((item,index)=><NewsCategoryCard {...item} {index}/>)}</div><PendingInformationCard lang={lang} item={pending.news}/></>}
-{page==='join-us' && <><SectionHeading eyebrow="Graduate research opportunities" title="與 AMPL 一起研究" description={join.lead}/><div class="join-detail"><article><h2>適合申請的對象</h2><ul>{join.audiences.map(item=><li>{item}</li>)}</ul></article><article><h2>研究主題</h2><ul>{join.topics.map(item=><li>{item}</li>)}</ul></article><article><h2>可培養的能力</h2><ul>{join.skills.map(item=><li>{item}</li>)}</ul></article></div><div class="contact-callout"><h2>如何聯繫</h2><p>{join.contact}</p><a class="button primary" href={`mailto:${lab.email}`}>{lab.email}</a></div></>}
-{page==='contact' && <><SectionHeading eyebrow="Get in touch" title="聯絡方式" description="歡迎就研究交流、合作與研究生申請聯繫實驗室。"/><div class="contact-grid"><article><span>Professor</span><h3>{lab.professor}</h3></article><article><span>Department</span><h3>國立成功大學機械工程學系</h3></article><article><span>Email</span><h3><a href={`mailto:${lab.email}`}>{lab.email}</a></h3></article><article><span>Laboratory</span><h3>Advanced Material and Processing Lab</h3></article></div><PendingInformationCard lang={lang} item={pending.location}/></>}
-</section></BaseLayout>
+
+<BaseLayout title={labels[lang][page]} lang={lang}>
+  <PageHero eyebrow={`AMPL · ${labels.en[page]}`} title={intro.title} description={intro.description} secondary={page === 'about' ? lab.englishName : undefined} />
+
+  <section class="page-content">
+    {page === 'about' && <>
+      <SectionHeading eyebrow="Lab profile" title="實驗室簡介" description={about.profile} />
+      <PrincipalInvestigatorCard lang={lang} />
+      <SectionHeading eyebrow="Professor profile" title="施士塵教授" description="學歷、簡要經歷與研究專長均依國立成功大學機械工程學系官方教師頁所列資料整理。" />
+      <ProfessorProfile lang={lang} />
+      <div class="prose-grid">
+        <article><h2>研究理念</h2><p>{about.philosophy}</p></article>
+        <article><h2>研究使命</h2><p>{about.mission}</p></article>
+      </div>
+    </>}
+
+    {page === 'research' && <>
+      <SectionHeading eyebrow="Six connected areas" title="從材料來源到應用場域的六項研究主軸" description="以綠色合成、奈米與生質複合材料、表面工程、磨潤、功能材料與模擬最佳化，連結材料設計與應用需求。" />
+      <div class="research-grid">
+        {researchAreas.map((area, index) => <ResearchCard title={area.title[lang]} description={area.description[lang]} tags={area.tags[lang]} motif={area.motif} {index} />)}
+      </div>
+      <SectionHeading eyebrow="AMPL pathway" title="研究流程" description="從農漁業副產物與材料設計出發，逐步連結製程、表面工程、表徵與模擬，再回到具體應用。" />
+      <Pipeline lang={lang} />
+      <SectionHeading eyebrow="Methods × applications" title="研究方法與應用面向" description="以材料、表面與模擬方法對應生醫、環境、感測及工程情境，支持材料與製程設計的整合判斷。" />
+      <MethodsApplications lang={lang} />
+    </>}
+
+    {page === 'members' && <>
+      <SectionHeading eyebrow="Principal investigator" title="研究團隊" description="實驗室成員資訊將以已確認的研究主題與聯絡資料正式發布。" />
+      <PrincipalInvestigatorCard lang={lang} />
+      <div class="pending-grid"><PendingInformationCard lang={lang} item={pending.members} /><PendingInformationCard lang={lang} item={pending.alumni} /></div>
+    </>}
+
+    {page === 'publications' && <>
+      <SectionHeading eyebrow="Research records" title="研究出版紀錄" description="精選論文與完整書目將以可核實的出版資訊整理呈現。" />
+      <PublicationPlaceholder lang={lang} />
+    </>}
+
+    {page === 'facilities' && <>
+      <SectionHeading eyebrow="Research capability categories" title="實驗室設施類別" description="先以研究所需的能力類別呈現；未經確認的設備名稱、規格與照片均不列入。" />
+      <div class="facility-grid">{facilityCategories[lang].map((item, index) => <FacilityCategoryCard {...item} {index} lang={lang} />)}</div>
+      <PendingInformationCard lang={lang} item={pending.facility} />
+    </>}
+
+    {page === 'news' && <>
+      <SectionHeading eyebrow="Formal updates" title="實驗室消息" description="此頁保留正式更新的發布框架，僅在資訊經確認後刊載。" />
+      <div class="news-grid">{newsCategories[lang].map((item, index) => <NewsCategoryCard {...item} {index} />)}</div>
+      <PendingInformationCard lang={lang} item={pending.news} />
+    </>}
+
+    {page === 'join-us' && <>
+      <SectionHeading eyebrow="Graduate research opportunities" title="加入 AMPL" description={join.lead} />
+      <div class="join-detail">
+        <article><h2>我們歡迎的背景</h2><ul>{join.audiences.map((item) => <li>{item}</li>)}</ul></article>
+        <article><h2>研究主題</h2><ul>{join.topics.map((item) => <li>{item}</li>)}</ul></article>
+        <article><h2>期待的能力</h2><ul>{join.skills.map((item) => <li>{item}</li>)}</ul></article>
+      </div>
+      <div class="contact-callout"><h2>聯絡方式</h2><p>{join.contact}</p><a class="button primary" href={`mailto:${lab.email}`}>{lab.email}</a></div>
+    </>}
+
+    {page === 'contact' && <>
+      <SectionHeading eyebrow="Get in touch" title="聯絡資訊" description="歡迎以電子郵件與施士塵教授聯繫研究合作、研究所申請或其他學術交流事宜。" />
+      <div class="contact-grid contact-grid--detailed">
+        <article><span>教授</span><h3>{lab.professor[lang]}</h3></article>
+        <article><span>系所</span><h3>{lab.department[lang]}</h3></article>
+        <article><span>教授室</span><h3>{lab.rooms.professorOffice[lang]}</h3></article>
+        <article><span>實驗室</span><h3>{lab.rooms.laboratory[lang]}</h3></article>
+        <article><span>學生討論室</span><h3>{lab.rooms.studentDiscussionRoom[lang]}</h3></article>
+        <article><span>電話</span><h3>教授室 {lab.phones.professorOffice}<br />實驗室 {lab.phones.laboratory}</h3></article>
+        <article><span>Email</span><h3><a href={`mailto:${lab.email}`}>{lab.email}</a></h3></article>
+        <article><span>個人網站</span><h3><a href={lab.personalWebsiteUrl} target="_blank" rel="noreferrer">ampl.me.ncku.edu.tw <span aria-hidden="true">↗</span></a></h3></article>
+      </div>
+      <a class="button primary external-map-link" href={lab.campusMapUrl} target="_blank" rel="noreferrer">成大官方校園地圖 <span aria-hidden="true">↗</span></a>
+    </>}
+  </section>
+</BaseLayout>
