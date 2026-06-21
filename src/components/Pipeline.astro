@@ -1,4 +1,4 @@
 ---
-const steps=['Waste / Biomass','Nanomaterials','Processing & Coating','Characterization / Simulation','Applications'];
+import { pipeline } from '../content/research'; import type { Locale } from '../content/site'; interface Props {lang:Locale} const {lang}=Astro.props; const steps=pipeline[lang];
 ---
-<ol class="pipeline" data-reveal>{steps.map((step,index)=><li><b>0{index+1}</b><span>{step}</span></li>)}</ol>
+<ol class="pipeline" data-reveal>{steps.map((step,index)=><li><b>0{index+1}</b><strong>{step.title}</strong><span>{step.description}</span></li>)}</ol>

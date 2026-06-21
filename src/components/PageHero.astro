@@ -1,0 +1,5 @@
+---
+interface Props { eyebrow:string; title:string; description:string; secondary?:string }
+const {eyebrow,title,description,secondary}=Astro.props;
+---
+<section class="page-hero"><span class="eyebrow">{eyebrow}</span><h1>{title}</h1>{secondary && <p class="page-secondary">{secondary}</p>}<p>{description}</p></section>

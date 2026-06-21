@@ -1,0 +1,6 @@
+---
+import type { Locale } from '../content/site'; import type { PendingInfo } from '../content/pending';
+interface Props { lang:Locale; item:PendingInfo; compact?:boolean }
+const {lang,item,compact=false}=Astro.props;
+---
+<article class:list={['pending-card', {'pending-compact': compact}]} data-reveal><span class="pending-status">{item.eyebrow[lang]}</span><h3>{item.title[lang]}</h3><p>{item.description[lang]}</p><div class="pending-request">{item.request[lang]}</div></article>

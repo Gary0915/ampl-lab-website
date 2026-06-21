@@ -1,0 +1,4 @@
+---
+interface Props { title:string; description:string; index:number } const {title,description,index}=Astro.props;
+---
+<article class="news-card" data-reveal><span>0{index+1}</span><h3>{title}</h3><p>{description}</p><div class="news-line"></div></article>
