@@ -20,6 +20,7 @@ import { pageIntro, aboutCopy, joinCopy } from '../../content/pages';
 import { pending } from '../../content/pending';
 import { researchAreas } from '../../content/research';
 import { publicationCopy } from '../../content/publications';
+import { projectCopy } from '../../content/projects';
 import { newsCategories } from '../../content/news';
 
 const lang = 'en' as const;
@@ -56,12 +57,19 @@ export function getStaticPaths() {
       </div>
       <SectionHeading eyebrow="Research capability summary" title="Research capability framework" description="Six capability areas organize the AMPL material research rhythm and connect the themes with methods and applications." />
       <ResearchCapabilitySummary lang={lang} />
-      <LabProducts lang={lang} />
-      <ProjectCollaborationSummary lang={lang} />
       <SectionHeading eyebrow="AMPL pathway" title="Research pathway" description="From agricultural and fishery by-products to material design, processing, characterization, simulation, and application contexts." />
       <Pipeline lang={lang} />
       <SectionHeading eyebrow="Methods × applications" title="Methods and application contexts" description="Material, surface, and simulation methods are organized alongside biomedical, environmental, sensing, and engineering application contexts." />
       <MethodsApplications lang={lang} />
+    </>}
+
+    {page === 'projects' && <>
+      <ProjectCollaborationSummary lang={lang} />
+      <div class="contact-callout project-contact-cta">
+        <h2>{projectCopy[lang].ctaTitle}</h2>
+        <p>{projectCopy[lang].ctaDescription}</p>
+        <a class="button primary" href="/en/contact">{projectCopy[lang].ctaLabel}</a>
+      </div>
     </>}
 
     {page === 'members' && <>

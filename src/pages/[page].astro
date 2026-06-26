@@ -20,6 +20,7 @@ import { pageIntro, aboutCopy, joinCopy } from '../content/pages';
 import { pending } from '../content/pending';
 import { researchAreas } from '../content/research';
 import { publicationCopy } from '../content/publications';
+import { projectCopy } from '../content/projects';
 import { newsCategories } from '../content/news';
 
 const lang = 'zh-Hant' as const;
@@ -56,12 +57,19 @@ export function getStaticPaths() {
       </div>
       <SectionHeading eyebrow="Research capability summary" title="研究能力架構" description="以六個能力面向整理 AMPL 的材料研究節奏，讓研究主軸與方法流程保持清楚對應。" />
       <ResearchCapabilitySummary lang={lang} />
-      <LabProducts lang={lang} />
-      <ProjectCollaborationSummary lang={lang} />
       <SectionHeading eyebrow="AMPL pathway" title="研究流程" description="從農漁業副產物與材料設計出發，逐步連結製程、表面工程、表徵與模擬，再回到具體應用。" />
       <Pipeline lang={lang} />
       <SectionHeading eyebrow="Methods × applications" title="研究方法與應用面向" description="以材料、表面與模擬方法對應生醫、環境、感測及工程情境，支持材料與製程設計的整合判斷。" />
       <MethodsApplications lang={lang} />
+    </>}
+
+    {page === 'projects' && <>
+      <ProjectCollaborationSummary lang={lang} />
+      <div class="contact-callout project-contact-cta">
+        <h2>{projectCopy[lang].ctaTitle}</h2>
+        <p>{projectCopy[lang].ctaDescription}</p>
+        <a class="button primary" href="/contact">{projectCopy[lang].ctaLabel}</a>
+      </div>
     </>}
 
     {page === 'members' && <>

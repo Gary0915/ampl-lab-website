@@ -1,4 +1,4 @@
 ---
-import { type Locale } from '../content/site'; interface Props { lang: Locale } const {lang}=Astro.props; const zh=lang==='zh-Hant';
+import { labels, type Locale } from '../content/site'; interface Props { lang: Locale } const {lang}=Astro.props; const zh=lang==='zh-Hant'; const prefix=lang==='en'?'/en':'';
 ---
-<footer><div><strong>AMPL</strong><p>{zh?'尖端材料及製程實驗室':'Advanced Material and Processing Lab'}<br/>{zh?'國立成功大學機械工程學系':'Department of Mechanical Engineering, NCKU'}</p></div><div><span>{zh?'研究主軸':'Research focus'}</span><p>Green synthesis · Nanomaterials · Surface engineering · Tribology</p></div><div><span>{zh?'聯絡方式':'Contact'}</span><a href="mailto:scshi@mail.ncku.edu.tw">scshi@mail.ncku.edu.tw</a></div></footer>
+<footer><div><strong>AMPL</strong><p>{zh?'尖端材料及製程實驗室':'Advanced Material and Processing Lab'}<br/>{zh?'國立成功大學機械工程學系':'Department of Mechanical Engineering, NCKU'}</p></div><div><span>{zh?'研究主軸':'Research focus'}</span><p>Green synthesis · Nanomaterials · Surface engineering · Tribology</p><nav class="footer-links" aria-label={zh?'次要連結':'Secondary links'}><a href={`${prefix}/projects`}>{labels[lang].projects}</a><a href={`${prefix}/news`}>{labels[lang].news}</a></nav></div><div><span>{zh?'聯絡方式':'Contact'}</span><a href="mailto:scshi@mail.ncku.edu.tw">scshi@mail.ncku.edu.tw</a></div></footer>

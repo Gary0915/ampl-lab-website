@@ -38,7 +38,7 @@ test('Contact page presents verified office details and external official links'
 });
 
 test('public pages do not expose internal pending markers', async ({ page }) => {
-  for (const path of ['/', '/about', '/research', '/members', '/publications', '/facilities', '/news', '/join-us', '/contact', '/en/', '/en/about', '/en/research', '/en/members', '/en/publications', '/en/facilities', '/en/news', '/en/join-us', '/en/contact']) {
+  for (const path of ['/', '/about', '/research', '/projects', '/members', '/publications', '/facilities', '/news', '/join-us', '/contact', '/en/', '/en/about', '/en/research', '/en/projects', '/en/members', '/en/publications', '/en/facilities', '/en/news', '/en/join-us', '/en/contact']) {
     await page.goto(path);
     await expect(page.locator('main')).not.toContainText('待提供：');
     await expect(page.locator('main')).not.toContainText('待確認：');
@@ -47,7 +47,7 @@ test('public pages do not expose internal pending markers', async ({ page }) => 
 });
 
 test('all Chinese and English routes expose a visible page heading', async ({ page }) => {
-  for (const path of ['/', '/about', '/research', '/members', '/publications', '/facilities', '/news', '/join-us', '/contact', '/en/', '/en/about', '/en/research', '/en/members', '/en/publications', '/en/facilities', '/en/news', '/en/join-us', '/en/contact']) {
+  for (const path of ['/', '/about', '/research', '/projects', '/members', '/publications', '/facilities', '/news', '/join-us', '/contact', '/en/', '/en/about', '/en/research', '/en/projects', '/en/members', '/en/publications', '/en/facilities', '/en/news', '/en/join-us', '/en/contact']) {
     await page.goto(path);
     await expect(page.locator('main h1')).toBeVisible();
   }
@@ -186,22 +186,60 @@ test('Official facilities equipment groups use normalized public equipment names
   }
 });
 
-test('Research page includes material platforms and conservative collaboration summary', async ({ page }) => {
+test('Information architecture rebalance keeps Research focused', async ({ page }) => {
   for (const path of ['/research', '/en/research'] as const) {
     await page.goto(path);
-    await expect(page.locator('.lab-products')).toBeVisible();
-    await expect(page.locator('.project-summary')).toBeVisible();
-    await expect(page.locator('main')).toContainText('Cellulose nanocrystal');
+    await expect(page.locator('.research-card')).toHaveCount(6);
+    await expect(page.locator('.capability-summary li')).toHaveCount(6);
+    await expect(page.locator('.pipeline li')).toHaveCount(5);
+    await expect(page.locator('.methods-row')).toHaveCount(3);
+    await expect(page.locator('.lab-products')).toHaveCount(0);
+    await expect(page.locator('.project-summary')).toHaveCount(0);
+    await expect(page.locator('main')).not.toContainText('Cellulose nanocrystal');
     await expect(page.locator('main')).not.toContainText('NSTC 113-2221-E-006');
     await expect(page.locator('main')).not.toContainText('台積電');
     await expect(page.locator('main')).not.toContainText('台達電');
   }
 });
 
+test('Information architecture rebalance adds localized Projects pages', async ({ page }) => {
+  await page.goto('/projects');
+  await expect(page.locator('main h1')).toHaveText('計畫與合作');
+  await expect(page.locator('.project-summary-card')).toHaveCount(3);
+  await expect(page.locator('main')).toContainText('公共研究計畫');
+  await expect(page.locator('main')).toContainText('產學合作');
+  await expect(page.locator('main')).toContainText('國際與學生研究');
+  await expect(page.getByRole('link', { name: '聯繫討論' })).toHaveAttribute('href', '/contact');
+  await expect(page.locator('main')).not.toContainText('NSTC');
+  await expect(page.locator('main')).not.toContainText('台積電');
+  await expect(page.locator('main')).not.toContainText('台達電');
+
+  await page.goto('/en/projects');
+  await expect(page.locator('main h1')).toHaveText('Projects & Collaboration');
+  await expect(page.locator('.project-summary-card')).toHaveCount(3);
+  await expect(page.locator('main')).toContainText('Public Research Projects');
+  await expect(page.locator('main')).toContainText('Industry Collaboration');
+  await expect(page.locator('main')).toContainText('International & Student Research');
+  await expect(page.getByRole('link', { name: 'Discuss collaboration' })).toHaveAttribute('href', '/en/contact');
+  await expect(page.locator('main')).not.toContainText('NSTC');
+});
+
+test('Information architecture rebalance updates primary navigation without crowding', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.desktop-nav')).toContainText('計畫合作');
+  await expect(page.locator('.desktop-nav')).not.toContainText('最新消息');
+  await expect(page.locator('footer')).toContainText('最新消息');
+
+  await page.goto('/en/');
+  await expect(page.locator('.desktop-nav')).toContainText('Projects');
+  await expect(page.locator('.desktop-nav')).not.toContainText('News');
+  await expect(page.locator('footer')).toContainText('News');
+});
+
 test('official records target pages have no horizontal overflow at QA widths', async ({ page }) => {
   for (const width of [1440, 1280, 1024, 768, 430, 390] as const) {
     await page.setViewportSize({ width, height: 900 });
-    for (const path of ['/publications', '/facilities', '/en/publications', '/en/facilities'] as const) {
+    for (const path of ['/publications', '/facilities', '/projects', '/en/publications', '/en/facilities', '/en/projects'] as const) {
       await page.goto(path);
       const sizes = await page.locator('html').evaluate((element) => ({ scrollWidth: element.scrollWidth, clientWidth: element.clientWidth }));
       expect(sizes.scrollWidth, `${path} at ${width}px`).toBeLessThanOrEqual(sizes.clientWidth);
