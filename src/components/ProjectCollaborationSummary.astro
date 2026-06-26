@@ -1,0 +1,27 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import { projectCopy, projectSummaryGroups } from '../content/projects';
+import type { Locale } from '../content/site';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const copy = projectCopy[lang];
+const groups = projectSummaryGroups[lang];
+---
+
+<section class="project-summary">
+  <SectionHeading eyebrow={copy.eyebrow} title={copy.title} description={copy.description} />
+  <div class="project-summary-grid">
+    {groups.map((group, index) => (
+      <article class="project-summary-card">
+        <span class="card-index">0{index + 1}</span>
+        <h3>{group.title}</h3>
+        <p>{group.description}</p>
+        <ul>
+          {group.themes.map((theme) => <li>{theme}</li>)}
+        </ul>
+      </article>
+    ))}
+  </div>
+  <p class="source-note">{copy.sourceNote}</p>
+</section>

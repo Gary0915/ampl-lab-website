@@ -1,0 +1,15 @@
+---
+import { officialProfileLinks } from '../content/publications';
+import type { Locale } from '../content/site';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+---
+
+<div class="official-profile-links" data-reveal>
+  {officialProfileLinks.map((link) => (
+    <a href={link.href} target="_blank" rel="noreferrer">
+      {link.label[lang]} <span aria-hidden="true">↗</span>
+    </a>
+  ))}
+</div>

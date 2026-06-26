@@ -6,17 +6,20 @@ import PrincipalInvestigatorCard from '../../components/PrincipalInvestigatorCar
 import ProfessorProfile from '../../components/ProfessorProfile.astro';
 import MethodsApplications from '../../components/MethodsApplications.astro';
 import PendingInformationCard from '../../components/PendingInformationCard.astro';
-import PublicationPlaceholder from '../../components/PublicationPlaceholder.astro';
-import FacilityCategoryCard from '../../components/FacilityCategoryCard.astro';
 import NewsCategoryCard from '../../components/NewsCategoryCard.astro';
 import ResearchCard from '../../components/ResearchCard.astro';
 import ResearchCapabilitySummary from '../../components/ResearchCapabilitySummary.astro';
 import Pipeline from '../../components/Pipeline.astro';
+import OfficialProfileLinks from '../../components/OfficialProfileLinks.astro';
+import SelectedPublications from '../../components/SelectedPublications.astro';
+import FacilityEquipmentGroups from '../../components/FacilityEquipmentGroups.astro';
+import LabProducts from '../../components/LabProducts.astro';
+import ProjectCollaborationSummary from '../../components/ProjectCollaborationSummary.astro';
 import { routes, type Route, labels, lab } from '../../content/site';
 import { pageIntro, aboutCopy, joinCopy } from '../../content/pages';
 import { pending } from '../../content/pending';
 import { researchAreas } from '../../content/research';
-import { facilityCategories } from '../../content/facilities';
+import { publicationCopy } from '../../content/publications';
 import { newsCategories } from '../../content/news';
 
 const lang = 'en' as const;
@@ -53,6 +56,8 @@ export function getStaticPaths() {
       </div>
       <SectionHeading eyebrow="Research capability summary" title="Research capability framework" description="Six capability areas organize the AMPL material research rhythm and connect the themes with methods and applications." />
       <ResearchCapabilitySummary lang={lang} />
+      <LabProducts lang={lang} />
+      <ProjectCollaborationSummary lang={lang} />
       <SectionHeading eyebrow="AMPL pathway" title="Research pathway" description="From agricultural and fishery by-products to material design, processing, characterization, simulation, and application contexts." />
       <Pipeline lang={lang} />
       <SectionHeading eyebrow="Methods × applications" title="Methods and application contexts" description="Material, surface, and simulation methods are organized alongside biomedical, environmental, sensing, and engineering application contexts." />
@@ -67,13 +72,14 @@ export function getStaticPaths() {
 
     {page === 'publications' && <>
       <SectionHeading eyebrow="Research records" title="Research publications" description="Selected publications and complete records will be presented with verified bibliographic information." />
-      <PublicationPlaceholder lang={lang} />
+      <OfficialProfileLinks lang={lang} />
+      <SelectedPublications lang={lang} variant="full" />
+      <p class="complete-records-note">{publicationCopy[lang].completeNote}</p>
     </>}
 
     {page === 'facilities' && <>
-      <SectionHeading eyebrow="Research capability categories" title="Facility categories" description="Research capability categories are presented first; unverified equipment names, specifications, and photographs are not listed." />
-      <div class="facility-grid">{facilityCategories[lang].map((item, index) => <FacilityCategoryCard {...item} {index} lang={lang} />)}</div>
-      <PendingInformationCard lang={lang} item={pending.facility} />
+      <FacilityEquipmentGroups lang={lang} />
+      <LabProducts lang={lang} />
     </>}
 
     {page === 'news' && <>
