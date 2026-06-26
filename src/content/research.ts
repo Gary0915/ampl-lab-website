@@ -82,3 +82,22 @@ export const methodsApplications: Localized<{ method: string; scope: string; app
     { method: 'Simulation-assisted optimization', scope: 'Molecular dynamics, stress analysis, and fluid analysis support material and process design decisions.', applications: ['Material design', 'Process optimization', 'Engineering applications'] },
   ],
 };
+
+export const researchCapabilities: Localized<{ title: string; description: string }[]> = {
+  'zh-Hant': [
+    { title: 'Resource Circularity', description: '從農漁業副產物與生質來源思考材料循環與低環境負荷製程。' },
+    { title: 'Material Synthesis', description: '建立奈米、生物高分子與複合材料的組成、結構與界面設計。' },
+    { title: 'Surface Engineering', description: '以表面加工與功能塗層連結材料性能、界面行為與應用需求。' },
+    { title: 'Tribology & Corrosion', description: '檢視摩擦、磨耗、腐蝕與耐久性相關的材料介面挑戰。' },
+    { title: 'Simulation-Assisted Design', description: '運用分子、應力與流體分析輔助材料與製程設計判斷。' },
+    { title: 'Application Translation', description: '將材料研究連結至生醫、環境、感測與工程應用情境。' },
+  ],
+  en: [
+    { title: 'Resource Circularity', description: 'Agricultural, fishery, and biomass resources frame lower-impact material processing questions.' },
+    { title: 'Material Synthesis', description: 'Nanomaterials, biopolymers, and composites are studied through composition, structure, and interfaces.' },
+    { title: 'Surface Engineering', description: 'Surface processing and functional coatings connect material performance with interface behavior.' },
+    { title: 'Tribology & Corrosion', description: 'Friction, wear, corrosion, and durability are examined as related interface challenges.' },
+    { title: 'Simulation-Assisted Design', description: 'Molecular, stress, and fluid analysis support material and process design decisions.' },
+    { title: 'Application Translation', description: 'Material studies are connected to biomedical, environmental, sensing, and engineering contexts.' },
+  ],
+};

@@ -1,0 +1,21 @@
+---
+import { researchCapabilities } from '../content/research';
+import type { Locale } from '../content/site';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const capabilities = researchCapabilities[lang];
+---
+
+<ul class="capability-summary" data-reveal>
+  {capabilities.map((item, index) => (
+    <li>
+      <span class="card-index">0{index + 1}</span>
+      <h3>{item.title}</h3>
+      <p>{item.description}</p>
+    </li>
+  ))}
+</ul>

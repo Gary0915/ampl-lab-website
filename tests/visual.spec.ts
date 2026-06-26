@@ -6,6 +6,7 @@ const captures = [
   ['/research', 'research-wide-desktop', { width: 1440, height: 1000 }],
   ['/research', 'research-tablet', { width: 1024, height: 1000 }],
   ['/research', 'research-mobile', { width: 390, height: 844 }],
+  ['/en/research', 'research-english-desktop', { width: 1280, height: 1000 }],
   ['/about', 'about-professor-desktop', { width: 1280, height: 1000 }],
   ['/publications', 'publications-desktop', { width: 1280, height: 1000 }],
   ['/facilities', 'facilities-desktop', { width: 1280, height: 1000 }],
