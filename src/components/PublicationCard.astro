@@ -1,0 +1,30 @@
+---
+import type { PublicationRecord } from '../content/publications';
+import type { Locale } from '../content/site';
+
+interface Props { publication: PublicationRecord; lang: Locale; compact?: boolean }
+const { publication, lang, compact = false } = Astro.props;
+---
+
+<article class:list={['publication-card', compact && 'publication-card--compact']}>
+  <div class="publication-meta">
+    <span>{publication.year}</span>
+    <small>{publication.date}</small>
+  </div>
+  <div class="publication-body">
+    <h3>{publication.title}</h3>
+    <p class="publication-authors">{publication.authors}</p>
+    <p class="publication-journal">
+      <strong>{publication.journal}</strong>{publication.citation ? `, ${publication.citation}` : ''}
+    </p>
+    {(publication.indexStatus || publication.professorRole) && (
+      <p class="publication-status">
+        {publication.indexStatus && <span>{publication.indexStatus}</span>}
+        {publication.professorRole && <span>{publication.professorRole[lang]}</span>}
+      </p>
+    )}
+    <ul class="publication-tags" aria-label={lang === 'zh-Hant' ? '研究關聯標籤' : 'Research relevance tags'}>
+      {publication.tags[lang].map((tag) => <li>{tag}</li>)}
+    </ul>
+  </div>
+</article>

@@ -1,0 +1,48 @@
+---
+import PublicationCard from './PublicationCard.astro';
+import SectionHeading from './SectionHeading.astro';
+import { publicationCopy, selectedPublications } from '../content/publications';
+import type { Locale } from '../content/site';
+
+interface Props { lang: Locale; variant?: 'preview' | 'full' }
+const { lang, variant = 'full' } = Astro.props;
+const copy = publicationCopy[lang];
+const records = variant === 'preview' ? selectedPublications.slice(0, 3) : selectedPublications;
+const grouped = records.reduce<Record<string, typeof records>>((acc, publication) => {
+  acc[publication.year] ??= [];
+  acc[publication.year].push(publication);
+  return acc;
+}, {});
+const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
+---
+
+<section class:list={['selected-publications', variant === 'preview' && 'selected-publications--preview']}>
+  <SectionHeading
+    eyebrow={variant === 'preview' ? copy.previewEyebrow : copy.pageEyebrow}
+    title={variant === 'preview' ? copy.previewTitle : copy.pageTitle}
+    description={variant === 'preview' ? copy.previewDescription : copy.pageDescription}
+  />
+
+  {variant === 'preview' ? (
+    <div class="publication-preview-grid">
+      {records.map((publication) => <PublicationCard publication={publication} lang={lang} compact />)}
+    </div>
+  ) : (
+    <div class="publication-year-list">
+      {years.map((year) => (
+        <section class="publication-year-group" aria-labelledby={`publication-year-${year}`}>
+          <h3 id={`publication-year-${year}`}>{copy.yearGroupLabel} {year}</h3>
+          <div class="publication-list">
+            {grouped[year].map((publication) => <PublicationCard publication={publication} lang={lang} />)}
+          </div>
+        </section>
+      ))}
+    </div>
+  )}
+
+  {variant === 'preview' && (
+    <a class="button secondary publication-cta" href={lang === 'zh-Hant' ? '/publications' : '/en/publications'}>
+      {copy.previewCta}
+    </a>
+  )}
+</section>

@@ -1,0 +1,28 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import { equipmentGroups, facilitiesCopy } from '../content/facilities';
+import type { Locale } from '../content/site';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const copy = facilitiesCopy[lang];
+const groups = equipmentGroups[lang];
+---
+
+<section class="facility-equipment">
+  <SectionHeading eyebrow={copy.eyebrow} title={copy.title} description={copy.description} />
+  <div class="equipment-groups">
+    {groups.map((group, index) => (
+      <article class={`equipment-card motif-${group.motif}`}>
+        <span class="card-index">0{index + 1}</span>
+        <div class="facility-motif" aria-hidden="true"></div>
+        <h3>{group.title}</h3>
+        <p>{group.description}</p>
+        <ul>
+          {group.items.map((item) => <li>{item}</li>)}
+        </ul>
+      </article>
+    ))}
+  </div>
+  <p class="source-note">{copy.sourceNote}</p>
+</section>

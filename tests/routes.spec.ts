@@ -159,3 +159,52 @@ test('visual refinement target pages have no horizontal overflow at QA widths', 
     }
   }
 });
+
+test('Official publications records replace placeholder-only publication pages', async ({ page }) => {
+  for (const path of ['/publications', '/en/publications'] as const) {
+    await page.goto(path);
+    await expect(page.locator('.publication-card')).toHaveCount(5);
+    await expect(page.locator('.publication-card').first()).toContainText('Laser Sintering of Ceramic Coatings on 304 Stainless Steel');
+    await expect(page.getByRole('link', { name: /Official NCKU|官方教師頁/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Professor Website|個人網站/i })).toBeVisible();
+    await expect(page.locator('main')).not.toContainText('Search');
+    await expect(page.locator('main')).not.toContainText('Filter');
+    await expect(page.locator('main')).not.toContainText('搜尋');
+    await expect(page.locator('main')).not.toContainText('篩選');
+  }
+});
+
+test('Official facilities equipment groups use normalized public equipment names', async ({ page }) => {
+  for (const path of ['/facilities', '/en/facilities'] as const) {
+    await page.goto(path);
+    await expect(page.locator('.equipment-groups article')).toHaveCount(5);
+    for (const item of ['Abaqus', 'Thermal CVD', 'Raman', 'Potentiostat', 'Incubator']) {
+      await expect(page.locator('main')).toContainText(item);
+    }
+    await expect(page.locator('main')).not.toContainText('Applicat0R');
+    await expect(page.locator('main')).not.toContainText('Incubat0R');
+  }
+});
+
+test('Research page includes material platforms and conservative collaboration summary', async ({ page }) => {
+  for (const path of ['/research', '/en/research'] as const) {
+    await page.goto(path);
+    await expect(page.locator('.lab-products')).toBeVisible();
+    await expect(page.locator('.project-summary')).toBeVisible();
+    await expect(page.locator('main')).toContainText('Cellulose nanocrystal');
+    await expect(page.locator('main')).not.toContainText('NSTC 113-2221-E-006');
+    await expect(page.locator('main')).not.toContainText('台積電');
+    await expect(page.locator('main')).not.toContainText('台達電');
+  }
+});
+
+test('official records target pages have no horizontal overflow at QA widths', async ({ page }) => {
+  for (const width of [1440, 1280, 1024, 768, 430, 390] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const path of ['/publications', '/facilities', '/en/publications', '/en/facilities'] as const) {
+      await page.goto(path);
+      const sizes = await page.locator('html').evaluate((element) => ({ scrollWidth: element.scrollWidth, clientWidth: element.clientWidth }));
+      expect(sizes.scrollWidth, `${path} at ${width}px`).toBeLessThanOrEqual(sizes.clientWidth);
+    }
+  }
+});
