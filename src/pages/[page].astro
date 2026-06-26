@@ -47,7 +47,7 @@ export function getStaticPaths() {
     </>}
 
     {page === 'research' && <>
-      <SectionHeading eyebrow="Six connected areas" title="從材料來源到應用場域的六項研究主軸" description="以綠色合成、奈米與生質複合材料、表面工程、磨潤、功能材料與模擬最佳化，連結材料設計與應用需求。" />
+      <SectionHeading className="section-heading--research-lead" eyebrow="Six connected areas" title="從材料來源到應用場域的六項研究主軸" description="以綠色合成、奈米與生質複合材料、表面工程、磨潤、功能材料與模擬最佳化，連結材料設計與應用需求。" />
       <div class="research-grid">
         {researchAreas.map((area, index) => <ResearchCard title={area.title[lang]} description={area.description[lang]} tags={area.tags[lang]} motif={area.motif} {index} />)}
       </div>

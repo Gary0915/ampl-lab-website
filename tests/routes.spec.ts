@@ -106,6 +106,14 @@ test('Research capability summary stays localized and responsive', async ({ page
   }
 });
 
+test('Chinese Research lead heading keeps its final character on the same desktop line', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/research');
+  const heading = page.getByRole('heading', { name: '從材料來源到應用場域的六項研究主軸' });
+  const box = await heading.boundingBox();
+  expect(box?.height).toBeLessThan(75);
+});
+
 for (const width of [1440, 1280, 1024, 768, 430, 390, 360]) {
   test(`home has no horizontal overflow at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
