@@ -11,18 +11,27 @@ export const projectCopy: Localized<{
   title: string;
   description: string;
   sourceNote: string;
+  ctaTitle: string;
+  ctaDescription: string;
+  ctaLabel: string;
 }> = {
   'zh-Hant': {
     eyebrow: '計畫與合作',
     title: '計畫與產學合作摘要',
     description: '依官方「計畫與產學合作」公開內容整理為 AMPL 的研究方向摘要，避免將實驗室網站變成完整教師履歷資料庫。',
     sourceNote: '完整計畫名稱、公司名稱、計畫編號與成果細節，建議於教授確認後再決定是否擴充。',
+    ctaTitle: '合作與研究交流',
+    ctaDescription: '若希望討論材料、製程、表徵或模擬相關合作，請透過正式聯絡資訊與實驗室聯繫。',
+    ctaLabel: '聯繫討論',
   },
   en: {
     eyebrow: 'Projects & collaboration',
     title: 'Projects & Collaboration Summary',
     description: 'Themes are summarized from the official Projects and Industry Collaboration section to communicate AMPL research directions without turning the site into a full faculty CV database.',
     sourceNote: 'Full project titles, company names, grant numbers, and outcome details should be expanded only after professor confirmation.',
+    ctaTitle: 'Research and collaboration enquiries',
+    ctaDescription: 'For collaboration related to materials, processing, characterization, or simulation, please contact the laboratory through the official contact information.',
+    ctaLabel: 'Discuss collaboration',
   },
 };
 
