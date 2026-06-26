@@ -7,9 +7,12 @@ const server = spawn(process.execPath, ['./node_modules/astro/astro.js', 'dev', 
 });
 
 const startedAt = Date.now();
+let runnerStarted = false;
 const timer = setInterval(() => {
   http.get('http://127.0.0.1:4321/', (response) => {
     response.resume();
+    if (runnerStarted) return;
+    runnerStarted = true;
     clearInterval(timer);
     const npxCommand = process.platform === 'win32' ? 'npx.cmd' : 'npx';
     const runner = spawn(npxCommand, ['playwright', 'test', ...process.argv.slice(2)], { stdio: 'inherit', shell: true });

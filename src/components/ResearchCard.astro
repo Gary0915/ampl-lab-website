@@ -1,4 +1,4 @@
 ---
 interface Props { title:string; description:string; tags:string[]; motif:string; index:number } const {title,description,tags,motif,index}=Astro.props;
 ---
-<article class={`research-card motif-${motif}`} data-reveal style={`--delay:${index*70}ms`}><div class="card-index">0{index+1}</div><div class="motif"></div><h3>{title}</h3><p>{description}</p><div class="tag-list">{tags.map(tag=><span>{tag}</span>)}</div></article>
+<article class={`research-card motif-${motif}`} data-reveal tabindex="0" aria-label={`0${index+1}. ${title}`} style={`--delay:${index*70}ms`}><div class="card-index">0{index+1}</div><div class="motif"></div><h3>{title}</h3><p>{description}</p><div class="tag-list">{tags.map(tag=><span>{tag}</span>)}</div></article>

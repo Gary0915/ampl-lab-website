@@ -1,1 +1,22 @@
-<div class="lattice" aria-hidden="true"><svg viewBox="0 0 560 560" fill="none"><path d="M64 344 162 160l132 92 133-126 78 166-170 144-171-58Z"/><path d="m64 344 230-92 41 184M162 160l173 276 170-144"/><circle class="lattice-node" cx="64" cy="344" r="8"/><circle class="lattice-node" cx="162" cy="160" r="7"/><circle class="lattice-node accent" cx="294" cy="252" r="9"/><circle class="lattice-node" cx="427" cy="126" r="7"/><circle class="lattice-node accent" cx="505" cy="292" r="8"/><circle class="lattice-node" cx="335" cy="436" r="7"/></svg><span></span><span></span></div>
+<div class="lattice" aria-hidden="true" data-lattice><svg viewBox="0 0 560 560" fill="none"><path d="M64 344 162 160l132 92 133-126 78 166-170 144-171-58Z"/><path d="m64 344 230-92 41 184M162 160l173 276 170-144"/><circle class="lattice-node" cx="64" cy="344" r="8"/><circle class="lattice-node" cx="162" cy="160" r="7"/><circle class="lattice-node accent" cx="294" cy="252" r="9"/><circle class="lattice-node" cx="427" cy="126" r="7"/><circle class="lattice-node accent" cx="505" cy="292" r="8"/><circle class="lattice-node" cx="335" cy="436" r="7"/></svg><span></span><span></span></div>
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const supportsFinePointer = window.matchMedia('(pointer: fine) and (min-width: 901px)');
+  document.querySelectorAll('[data-lattice]').forEach((lattice) => {
+    if (!(lattice instanceof HTMLElement)) return;
+    if (reduceMotion.matches || !supportsFinePointer.matches) return;
+    const hero = lattice.closest('.hero') ?? lattice;
+    hero.addEventListener('pointermove', (event) => {
+      if (!(event instanceof PointerEvent)) return;
+      const bounds = hero.getBoundingClientRect();
+      const x = ((event.clientX - bounds.left) / bounds.width - 0.5) * 8;
+      const y = ((event.clientY - bounds.top) / bounds.height - 0.5) * 8;
+      lattice.style.setProperty('--lattice-shift-x', `${x.toFixed(2)}px`);
+      lattice.style.setProperty('--lattice-shift-y', `${y.toFixed(2)}px`);
+    }, { passive: true });
+    hero.addEventListener('pointerleave', () => {
+      lattice.style.setProperty('--lattice-shift-x', '0px');
+      lattice.style.setProperty('--lattice-shift-y', '0px');
+    });
+  });
+</script>
