@@ -114,6 +114,32 @@ test('Chinese Research lead heading keeps its final character on the same deskto
   expect(box?.height).toBeLessThan(75);
 });
 
+test('Research motion hooks stay restrained and keyboard reachable', async ({ page }) => {
+  await page.goto('/research');
+  const pathwayDelays = await page.locator('.pipeline li').evaluateAll((items) => items.map((item) => ({
+    delay: (item as HTMLElement).style.getPropertyValue('--step-delay'),
+    tabIndex: item.getAttribute('tabindex'),
+    aria: item.getAttribute('aria-label'),
+  })));
+  expect(pathwayDelays).toHaveLength(5);
+  expect(pathwayDelays.map((item) => item.delay)).toEqual(['0ms', '80ms', '160ms', '240ms', '320ms']);
+  expect(pathwayDelays.every((item) => item.tabIndex === '0')).toBe(true);
+  expect(pathwayDelays[0].aria).toContain('農漁業副產物');
+
+  await expect(page.locator('.research-card').first()).toHaveAttribute('tabindex', '0');
+  await expect(page.locator('.capability-summary li').first()).toHaveAttribute('tabindex', '0');
+  const capabilityDelay = await page.locator('.capability-summary li').nth(2).evaluate((element) => (element as HTMLElement).style.getPropertyValue('--cap-delay'));
+  expect(capabilityDelay).toBe('140ms');
+});
+
+test('reduced motion disables decorative pipeline animation', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/research');
+  await expect(page.locator('.pipeline li').first()).toHaveCSS('animation-name', 'none');
+  await page.goto('/');
+  await expect(page.locator('.lattice-node').first()).toHaveCSS('animation-name', 'none');
+});
+
 for (const width of [1440, 1280, 1024, 768, 430, 390, 360]) {
   test(`home has no horizontal overflow at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
