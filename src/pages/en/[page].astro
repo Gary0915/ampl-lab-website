@@ -10,6 +10,7 @@ import PublicationPlaceholder from '../../components/PublicationPlaceholder.astr
 import FacilityCategoryCard from '../../components/FacilityCategoryCard.astro';
 import NewsCategoryCard from '../../components/NewsCategoryCard.astro';
 import ResearchCard from '../../components/ResearchCard.astro';
+import ResearchCapabilitySummary from '../../components/ResearchCapabilitySummary.astro';
 import Pipeline from '../../components/Pipeline.astro';
 import { routes, type Route, labels, lab } from '../../content/site';
 import { pageIntro, aboutCopy, joinCopy } from '../../content/pages';
@@ -50,6 +51,8 @@ export function getStaticPaths() {
       <div class="research-grid">
         {researchAreas.map((area, index) => <ResearchCard title={area.title[lang]} description={area.description[lang]} tags={area.tags[lang]} motif={area.motif} {index} />)}
       </div>
+      <SectionHeading eyebrow="Research capability summary" title="Research capability framework" description="Six capability areas organize the AMPL material research rhythm and connect the themes with methods and applications." />
+      <ResearchCapabilitySummary lang={lang} />
       <SectionHeading eyebrow="AMPL pathway" title="Research pathway" description="From agricultural and fishery by-products to material design, processing, characterization, simulation, and application contexts." />
       <Pipeline lang={lang} />
       <SectionHeading eyebrow="Methods × applications" title="Methods and application contexts" description="Material, surface, and simulation methods are organized alongside biomedical, environmental, sensing, and engineering application contexts." />
