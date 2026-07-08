@@ -8,15 +8,11 @@ interface Props { lang: Locale; variant?: 'preview' | 'full' }
 const { lang, variant = 'full' } = Astro.props;
 const copy = publicationCopy[lang];
 const records = variant === 'preview' ? selectedPublications.slice(0, 3) : selectedPublications;
-const grouped = records.reduce<Record<string, typeof records>>((acc, publication) => {
-  acc[publication.year] ??= [];
-  acc[publication.year].push(publication);
-  return acc;
-}, {});
-const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
+const leadPublication = records[0];
+const secondaryPublications = records.slice(1);
 ---
 
-<section class:list={['selected-publications', variant === 'preview' && 'selected-publications--preview']}>
+<section class:list={['selected-publications', variant === 'preview' ? 'selected-publications--preview' : 'selected-publications--full']}>
   <SectionHeading
     eyebrow={variant === 'preview' ? copy.previewEyebrow : copy.pageEyebrow}
     title={variant === 'preview' ? copy.previewTitle : copy.pageTitle}
@@ -28,16 +24,19 @@ const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
       {records.map((publication) => <PublicationCard publication={publication} lang={lang} compact />)}
     </div>
   ) : (
-    <div class="publication-year-list">
-      {years.map((year) => (
-        <section class="publication-year-group" aria-labelledby={`publication-year-${year}`}>
-          <h3 id={`publication-year-${year}`}>{copy.yearGroupLabel} {year}</h3>
-          <div class="publication-list">
-            {grouped[year].map((publication) => <PublicationCard publication={publication} lang={lang} />)}
+    leadPublication && (
+      <div class="publication-year-list publication-featured-list">
+        <section class="publication-year-group publication-featured-group" aria-labelledby={`publication-year-${leadPublication.year}`}>
+          <h3 id={`publication-year-${leadPublication.year}`}>{copy.yearGroupLabel} {leadPublication.year}</h3>
+          <div class="publication-featured-layout">
+            <PublicationCard publication={leadPublication} lang={lang} lead />
+            <div class="publication-secondary-grid">
+              {secondaryPublications.map((publication) => <PublicationCard publication={publication} lang={lang} />)}
+            </div>
           </div>
         </section>
-      ))}
-    </div>
+      </div>
+    )
   )}
 
   {variant === 'preview' && (

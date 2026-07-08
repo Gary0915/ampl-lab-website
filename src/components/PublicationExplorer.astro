@@ -1,0 +1,181 @@
+---
+import PublicationRow from './PublicationRow.astro';
+import SectionHeading from './SectionHeading.astro';
+import { publicationCopy, type PublicationRecord } from '../content/publications';
+import type { Locale } from '../content/site';
+
+interface Props {
+  lang: Locale;
+  publications: PublicationRecord[];
+}
+
+const { lang, publications } = Astro.props;
+const copy = publicationCopy[lang];
+const ui = {
+  'zh-Hant': {
+    all: '全部',
+    year: '年份',
+    topic: '主題',
+    showMore: '顯示更多',
+    showAll: '顯示全部',
+    count: (visible: number, total: number) => `顯示 ${visible} / ${total} 筆`,
+    empty: '目前沒有符合條件的期刊論文紀錄。',
+  },
+  en: {
+    all: 'All',
+    year: 'Year',
+    topic: 'Topic',
+    showMore: 'Show more',
+    showAll: 'Show all',
+    count: (visible: number, total: number) => `Showing ${visible} of ${total} records`,
+    empty: 'No journal publication records match the selected filters.',
+  },
+}[lang];
+
+const years = Array.from(new Set(publications.map((publication) => publication.year))).sort((a, b) => Number(b) - Number(a));
+const topicCounts = new Map<string, number>();
+for (const publication of publications) {
+  for (const tag of publication.tags[lang]) {
+    topicCounts.set(tag, (topicCounts.get(tag) ?? 0) + 1);
+  }
+}
+const topics = Array.from(topicCounts.entries())
+  .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+  .slice(0, 10)
+  .map(([topic]) => topic);
+const initialCount = 10;
+---
+
+<section
+  class="publication-explorer"
+  data-publication-explorer
+  data-initial-count={initialCount}
+  data-count-template={lang === 'zh-Hant' ? '顯示 {visible} / {total} 筆' : 'Showing {visible} of {total} records'}
+>
+  <SectionHeading eyebrow={copy.explorerEyebrow} title={copy.explorerTitle} description={copy.explorerDescription} />
+
+  <div class="publication-explorer__panel" aria-label={lang === 'zh-Hant' ? '期刊論文篩選' : 'Publication filters'}>
+    <div class="publication-explorer__toolbar">
+      <p class="publication-explorer__count" data-publication-count>{ui.count(Math.min(initialCount, publications.length), publications.length)}</p>
+      <p class="publication-explorer__hint">
+        {lang === 'zh-Hant'
+          ? '使用官方紀錄日期排序；篩選後顯示數量會重新計算。'
+          : 'Sorted by official record date; visible counts update after filtering.'}
+      </p>
+    </div>
+
+    <div class="publication-filter-block">
+      <span>{ui.year}</span>
+      <div class="publication-chip-group" data-filter-group="year">
+        <button class="publication-chip is-active" type="button" data-filter-value="all" aria-pressed="true">{ui.all}</button>
+        {years.map((year) => (
+          <button class="publication-chip" type="button" data-filter-value={year} aria-pressed="false">{year}</button>
+        ))}
+      </div>
+    </div>
+
+    <div class="publication-filter-block">
+      <span>{ui.topic}</span>
+      <div class="publication-chip-group" data-filter-group="topic">
+        <button class="publication-chip is-active" type="button" data-filter-value="all" aria-pressed="true">{ui.all}</button>
+        {topics.map((topic) => (
+          <button class="publication-chip" type="button" data-filter-value={topic} aria-pressed="false">{topic}</button>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <div class="publication-explorer__list" data-publication-list>
+    {publications.map((publication, index) => (
+      <div
+        data-publication-item
+        data-index={index}
+        data-year={publication.year}
+        data-topics={publication.tags[lang].join('|')}
+      >
+        <PublicationRow publication={publication} lang={lang} />
+      </div>
+    ))}
+  </div>
+
+  <p class="publication-explorer__empty" data-publication-empty hidden>{ui.empty}</p>
+
+  <div class="publication-explorer__actions">
+    <button class="button secondary" type="button" data-show-more>{ui.showMore}</button>
+    <button class="button publication-show-all" type="button" data-show-all>{ui.showAll}</button>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('[data-publication-explorer]').forEach((explorer) => {
+    const initialCount = Number(explorer.getAttribute('data-initial-count') || '10');
+    const countTemplate = explorer.getAttribute('data-count-template') || 'Showing {visible} of {total} records';
+    const items = Array.from(explorer.querySelectorAll<HTMLElement>('[data-publication-item]'));
+    const count = explorer.querySelector<HTMLElement>('[data-publication-count]');
+    const showMore = explorer.querySelector<HTMLButtonElement>('[data-show-more]');
+    const showAll = explorer.querySelector<HTMLButtonElement>('[data-show-all]');
+    const empty = explorer.querySelector<HTMLElement>('[data-publication-empty]');
+    let visibleCount = initialCount;
+    let activeYear = 'all';
+    let activeTopic = 'all';
+
+    const setCountText = (visible: number, total: number) => {
+      if (!count) return;
+      count.textContent = countTemplate.replace('{visible}', String(visible)).replace('{total}', String(total));
+    };
+
+    const update = () => {
+      const filtered = items.filter((item) => {
+        const yearMatches = activeYear === 'all' || item.getAttribute('data-year') === activeYear;
+        const topics = (item.getAttribute('data-topics') || '').split('|');
+        const topicMatches = activeTopic === 'all' || topics.includes(activeTopic);
+        return yearMatches && topicMatches;
+      });
+      const visibleItems = filtered.slice(0, visibleCount);
+
+      items.forEach((item) => {
+        item.hidden = true;
+      });
+      visibleItems.forEach((item) => {
+        item.hidden = false;
+      });
+
+      if (empty) empty.hidden = filtered.length > 0;
+      if (showMore) showMore.hidden = visibleItems.length >= filtered.length;
+      if (showAll) showAll.hidden = visibleItems.length >= filtered.length;
+      setCountText(visibleItems.length, filtered.length);
+    };
+
+    explorer.querySelectorAll('[data-filter-group]').forEach((group) => {
+      group.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLButtonElement)) return;
+        const value = target.getAttribute('data-filter-value') || 'all';
+        const type = group.getAttribute('data-filter-group');
+
+        group.querySelectorAll('button').forEach((button) => {
+          const active = button === target;
+          button.classList.toggle('is-active', active);
+          button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+
+        if (type === 'year') activeYear = value;
+        if (type === 'topic') activeTopic = value;
+        visibleCount = initialCount;
+        update();
+      });
+    });
+
+    showMore?.addEventListener('click', () => {
+      visibleCount += 10;
+      update();
+    });
+
+    showAll?.addEventListener('click', () => {
+      visibleCount = items.length;
+      update();
+    });
+
+    update();
+  });
+</script>

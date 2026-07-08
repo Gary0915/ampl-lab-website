@@ -43,6 +43,9 @@ test('public pages do not expose internal pending markers', async ({ page }) => 
     await expect(page.locator('main')).not.toContainText('待提供：');
     await expect(page.locator('main')).not.toContainText('待確認：');
     await expect(page.locator('main')).not.toContainText('[Pending]');
+    await expect(page.locator('main')).not.toContainText('needsReview');
+    await expect(page.locator('main')).not.toContainText('review pending');
+    await expect(page.locator('main')).not.toContainText('待審');
   }
 });
 
@@ -163,15 +166,64 @@ test('visual refinement target pages have no horizontal overflow at QA widths', 
 test('Official publications records replace placeholder-only publication pages', async ({ page }) => {
   for (const path of ['/publications', '/en/publications'] as const) {
     await page.goto(path);
-    await expect(page.locator('.publication-card')).toHaveCount(5);
-    await expect(page.locator('.publication-card').first()).toContainText('Laser Sintering of Ceramic Coatings on 304 Stainless Steel');
+    await expect(page.locator('[data-publication-card]')).toHaveCount(5);
+    await expect(page.locator('[data-publication-card]').first()).toContainText('AI-Driven Intelligent Grinding Automation for Precision Motorcycle Camshaft Manufacturing');
+    await expect(page.locator('[data-publication-explorer]')).toBeVisible();
+    await expect(page.locator('[data-publication-item]')).toHaveCount(30);
     await expect(page.getByRole('link', { name: /Official NCKU|官方教師頁/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /Professor Website|個人網站/i })).toBeVisible();
     await expect(page.locator('main')).not.toContainText('Search');
-    await expect(page.locator('main')).not.toContainText('Filter');
     await expect(page.locator('main')).not.toContainText('搜尋');
-    await expect(page.locator('main')).not.toContainText('篩選');
+    await expect(page.locator('[data-filter-group="year"]')).toBeVisible();
+    await expect(page.locator('[data-filter-group="topic"]')).toBeVisible();
   }
+});
+
+test('Home keeps selected publications preview compact', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.selected-publications--preview [data-publication-card]')).toHaveCount(3);
+  await expect(page.locator('.selected-publications--preview')).toContainText('AI-Driven Intelligent Grinding Automation for Precision Motorcycle Camshaft Manufacturing');
+});
+
+test('Publications explorer uses progressive disclosure', async ({ page }) => {
+  await page.goto('/publications/');
+  await expect(page.locator('[data-publication-item]:visible')).toHaveCount(10);
+  await expect(page.locator('[data-publication-count]')).toContainText('顯示 10 / 30 筆');
+
+  await page.locator('[data-show-more]').click();
+  await expect(page.locator('[data-publication-item]:visible')).toHaveCount(20);
+  await expect(page.locator('[data-publication-count]')).toContainText('顯示 20 / 30 筆');
+
+  await page.locator('[data-show-all]').click();
+  await expect(page.locator('[data-publication-item]:visible')).toHaveCount(30);
+  await expect(page.locator('[data-publication-count]')).toContainText('顯示 30 / 30 筆');
+});
+
+test('Publication year filter changes visible records', async ({ page }) => {
+  await page.goto('/publications/');
+  const chip = page.locator('[data-filter-group="year"] button[data-filter-value="2025"]');
+  await chip.click();
+
+  const visibleRows = page.locator('[data-publication-item]:visible');
+  await expect(visibleRows).toHaveCount(10);
+  await expect(chip).toHaveAttribute('aria-pressed', 'true');
+
+  const visibleYears = await visibleRows.evaluateAll((items) => items.map((item) => item.getAttribute('data-year')));
+  expect(new Set(visibleYears)).toEqual(new Set(['2025']));
+  await expect(page.locator('[data-publication-count]')).toContainText('顯示 10 / 17 筆');
+});
+
+test('Publication topic filter changes visible records', async ({ page }) => {
+  await page.goto('/en/publications/');
+  const chip = page.locator('[data-filter-group="topic"] button[data-filter-value="Sensing Materials"]');
+  await chip.click();
+
+  const visibleRows = page.locator('[data-publication-item]:visible');
+  await expect(visibleRows.first()).toBeVisible();
+  await expect(chip).toHaveAttribute('aria-pressed', 'true');
+
+  const visibleTopics = await visibleRows.evaluateAll((items) => items.map((item) => item.getAttribute('data-topics') || ''));
+  expect(visibleTopics.every((topics) => topics.includes('Sensing Materials'))).toBe(true);
 });
 
 test('Official facilities equipment groups use normalized public equipment names', async ({ page }) => {

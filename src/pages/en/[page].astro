@@ -12,6 +12,7 @@ import ResearchCapabilitySummary from '../../components/ResearchCapabilitySummar
 import Pipeline from '../../components/Pipeline.astro';
 import OfficialProfileLinks from '../../components/OfficialProfileLinks.astro';
 import SelectedPublications from '../../components/SelectedPublications.astro';
+import PublicationExplorer from '../../components/PublicationExplorer.astro';
 import FacilityEquipmentGroups from '../../components/FacilityEquipmentGroups.astro';
 import LabProducts from '../../components/LabProducts.astro';
 import ProjectCollaborationSummary from '../../components/ProjectCollaborationSummary.astro';
@@ -19,7 +20,7 @@ import { routes, type Route, labels, lab } from '../../content/site';
 import { pageIntro, aboutCopy, joinCopy } from '../../content/pages';
 import { pending } from '../../content/pending';
 import { researchAreas } from '../../content/research';
-import { publicationCopy } from '../../content/publications';
+import { publicationCopy, recentJournalPublications } from '../../content/publications';
 import { projectCopy } from '../../content/projects';
 import { newsCategories } from '../../content/news';
 
@@ -82,6 +83,7 @@ export function getStaticPaths() {
       <SectionHeading eyebrow="Research records" title="Research publications" description="Selected publications and complete records will be presented with verified bibliographic information." />
       <OfficialProfileLinks lang={lang} />
       <SelectedPublications lang={lang} variant="full" />
+      <PublicationExplorer lang={lang} publications={recentJournalPublications} />
       <p class="complete-records-note">{publicationCopy[lang].completeNote}</p>
     </>}
 

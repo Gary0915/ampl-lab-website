@@ -2,11 +2,11 @@
 import type { PublicationRecord } from '../content/publications';
 import type { Locale } from '../content/site';
 
-interface Props { publication: PublicationRecord; lang: Locale; compact?: boolean }
-const { publication, lang, compact = false } = Astro.props;
+interface Props { publication: PublicationRecord; lang: Locale; compact?: boolean; lead?: boolean }
+const { publication, lang, compact = false, lead = false } = Astro.props;
 ---
 
-<article class:list={['publication-card', compact && 'publication-card--compact']}>
+<article class:list={['publication-card', compact && 'publication-card--compact', lead && 'publication-card--lead']} data-publication-card tabindex="0">
   <div class="publication-meta">
     <span>{publication.year}</span>
     <small>{publication.date}</small>
@@ -24,7 +24,7 @@ const { publication, lang, compact = false } = Astro.props;
       </p>
     )}
     <ul class="publication-tags" aria-label={lang === 'zh-Hant' ? '研究關聯標籤' : 'Research relevance tags'}>
-      {publication.tags[lang].map((tag) => <li>{tag}</li>)}
+      {publication.tags[lang].slice(0, 3).map((tag) => <li>{tag}</li>)}
     </ul>
   </div>
 </article>
