@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import type { Locale } from '../src/content/site';
 import { getAbsoluteUrl, getRoutePath, seoConfig, seoPages, type SeoRoute } from '../src/content/seo';
 
@@ -27,6 +27,64 @@ const seoRouteCases: Array<{ path: string; lang: Locale; route: SeoRoute }> = [
   { path: '/en/news/', lang: 'en', route: 'news' },
 ];
 
+async function measureTransparentPng(page: Page, filename: string, size: number) {
+  const image = readFileSync(path.join(process.cwd(), 'public', filename));
+  const encoded = image.toString('base64');
+  return page.evaluate(async ({ encoded, size }) => {
+    const img = new Image();
+    img.src = `data:image/png;base64,${encoded}`;
+    await img.decode();
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Canvas context unavailable');
+    ctx.clearRect(0, 0, size, size);
+    ctx.drawImage(img, 0, 0, size, size);
+    const data = ctx.getImageData(0, 0, size, size).data;
+    let minX = size;
+    let minY = size;
+    let maxX = -1;
+    let maxY = -1;
+    let checkerPixels = 0;
+    for (let y = 0; y < size; y += 1) {
+      for (let x = 0; x < size; x += 1) {
+        const index = (y * size + x) * 4;
+        const red = data[index];
+        const green = data[index + 1];
+        const blue = data[index + 2];
+        const alpha = data[index + 3];
+        if (alpha > 8) {
+          minX = Math.min(minX, x);
+          minY = Math.min(minY, y);
+          maxX = Math.max(maxX, x);
+          maxY = Math.max(maxY, y);
+        }
+        const isWhite = red > 245 && green > 245 && blue > 245;
+        const isCheckerGray = red >= 190 && red <= 215 && green >= 190 && green <= 215 && blue >= 190 && blue <= 215;
+        if (alpha === 255 && (isWhite || isCheckerGray)) checkerPixels += 1;
+      }
+    }
+    const width = maxX >= 0 ? maxX - minX + 1 : 0;
+    const height = maxY >= 0 ? maxY - minY + 1 : 0;
+    const corners = [
+      [0, 0],
+      [size - 1, 0],
+      [0, size - 1],
+      [size - 1, size - 1],
+    ].map(([x, y]) => Array.from(ctx.getImageData(x, y, 1, 1).data));
+    return {
+      width,
+      height,
+      widthRatio: width / size,
+      heightRatio: height / size,
+      maxRatio: Math.max(width, height) / size,
+      corners,
+      checkerPixels,
+    };
+  }, { encoded, size });
+}
+
 test('main routes expose centralized SEO, Open Graph, Twitter card, and hreflang metadata', async ({ page }) => {
   for (const item of seoRouteCases) {
     await page.goto(item.path);
@@ -38,6 +96,9 @@ test('main routes expose centralized SEO, Open Graph, Twitter card, and hreflang
 
     await expect(page).toHaveTitle(expected.title);
     await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', expected.description);
+    await expect(page.locator('link[rel="icon"][href="/favicon.ico"]')).toHaveAttribute('sizes', 'any');
+    await expect(page.locator('link[rel="icon"][href="/favicon.svg"]')).toHaveAttribute('type', 'image/svg+xml');
+    await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute('href', '/apple-touch-icon.png');
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', expectedCanonical);
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', expected.title);
     await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', expected.description);
@@ -73,6 +134,56 @@ test('branded Open Graph image exists as a 1200 by 630 PNG', () => {
   expect(image.subarray(1, 4).toString('ascii')).toBe('PNG');
   expect(image.readUInt32BE(16)).toBe(1200);
   expect(image.readUInt32BE(20)).toBe(630);
+});
+
+test('favicon and app icon assets are optically sized from vector source', async ({ page }) => {
+  const publicPath = path.join(process.cwd(), 'public');
+  const svg = readFileSync(path.join(publicPath, 'favicon.svg'), 'utf8');
+  expect(svg).toContain('<svg');
+  expect(svg).not.toMatch(/<image|base64|data:image/i);
+
+  for (const [filename, width, height] of [
+    ['favicon-16x16.png', 16, 16],
+    ['favicon-32x32.png', 32, 32],
+    ['apple-touch-icon.png', 180, 180],
+    ['icon-192.png', 192, 192],
+    ['icon-512.png', 512, 512],
+  ] as const) {
+    const image = readFileSync(path.join(publicPath, filename));
+    expect(image.subarray(1, 4).toString('ascii')).toBe('PNG');
+    expect(image.readUInt32BE(16)).toBe(width);
+    expect(image.readUInt32BE(20)).toBe(height);
+    expect(image[25]).toBe(6);
+  }
+
+  const app512 = await measureTransparentPng(page, 'icon-512.png', 512);
+  expect(app512.maxRatio).toBeGreaterThanOrEqual(0.88);
+  expect(app512.maxRatio).toBeLessThanOrEqual(0.92);
+  expect(app512.checkerPixels).toBe(0);
+  expect(app512.corners.every((pixel) => pixel[3] === 0)).toBe(true);
+
+  const app192 = await measureTransparentPng(page, 'icon-192.png', 192);
+  expect(app192.maxRatio).toBeGreaterThanOrEqual(0.88);
+  expect(app192.maxRatio).toBeLessThanOrEqual(0.93);
+  expect(app192.checkerPixels).toBe(0);
+  expect(app192.corners.every((pixel) => pixel[3] === 0)).toBe(true);
+
+  const favicon32 = await measureTransparentPng(page, 'favicon-32x32.png', 32);
+  expect(favicon32.widthRatio).toBeGreaterThanOrEqual(0.8);
+  expect(favicon32.maxRatio).toBeGreaterThanOrEqual(0.9);
+  expect(favicon32.checkerPixels).toBe(0);
+  expect(favicon32.corners.every((pixel) => pixel[3] === 0)).toBe(true);
+
+  const favicon16 = await measureTransparentPng(page, 'favicon-16x16.png', 16);
+  expect(favicon16.widthRatio).toBeGreaterThanOrEqual(0.85);
+  expect(favicon16.maxRatio).toBeGreaterThanOrEqual(0.9);
+  expect(favicon16.checkerPixels).toBe(0);
+  expect(favicon16.corners.every((pixel) => pixel[3] === 0)).toBe(true);
+
+  const ico = readFileSync(path.join(publicPath, 'favicon.ico'));
+  expect(ico.readUInt16LE(0)).toBe(0);
+  expect(ico.readUInt16LE(2)).toBe(1);
+  expect(ico.readUInt16LE(4)).toBe(2);
 });
 
 test('traditional Chinese home exposes a named main landmark', async ({ page }) => {

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="202 176 830 830" role="img" aria-labelledby="title desc">
+  <title id="title">AMPL favicon mark</title>
+  <desc id="desc">Open hexagonal material frame with central four-node lattice, muted green leaf cue, and small gold node accent.</desc>
+
+  <g fill="none" stroke="#062B52" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Open hexagonal material frame -->
+    <path
+      d="M624 236 L864 380
+         M914 472 L914 744
+         M688 908 L624 946 L320 768 L320 418 L624 236"
+      stroke-width="36"/>
+
+    <!-- Central 4-node lattice bonds -->
+    <path
+      d="M624 426 L462 596 L624 760 L790 596 L624 426"
+      stroke-width="17"/>
+  </g>
+
+  <!-- Central 4-node lattice -->
+  <g fill="#062B52">
+    <circle cx="624" cy="426" r="42"/>
+    <circle cx="462" cy="596" r="42"/>
+    <circle cx="790" cy="596" r="42"/>
+    <circle cx="624" cy="760" r="42"/>
+  </g>
+
+  <!-- Tiny restrained gold node accent -->
+  <circle cx="915" cy="415" r="20" fill="#D3A62D"/>
+
+  <!-- Lower-right leaf cue: dark material cap + muted bio-based fill -->
+  <path
+    d="M721 900
+       C720 852 748 812 792 793
+       C818 783 843 779 865 779
+       C850 801 829 819 802 837
+       C768 859 743 879 721 900 Z"
+    fill="#062B52"/>
+
+  <path
+    d="M724 899
+       C744 849 790 815 861 791
+       C848 824 819 855 781 877
+       C760 889 740 896 724 899 Z"
+    fill="#7C9674"/>
+</svg>
