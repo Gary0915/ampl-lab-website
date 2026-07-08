@@ -2,11 +2,13 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import SEO from '../components/SEO.astro';
 import type { Locale } from '../content/site';
-interface Props { title: string; lang: Locale }
-const { title, lang } = Astro.props;
+import type { SeoRoute } from '../content/seo';
+interface Props { title: string; lang: Locale; route?: SeoRoute }
+const { title, lang, route = 'home' } = Astro.props;
 ---
-<!doctype html><html lang={lang}><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content="Advanced Material and Processing Lab, National Cheng Kung University."/><title>{title} | AMPL</title></head><body>
+<!doctype html><html lang={lang}><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><SEO lang={lang} route={route} title={title}/></head><body>
 <a class="skip" href="#content">Skip to content</a><Header lang={lang}/><main id="content"><slot/></main><Footer lang={lang}/>
 <script>
   const header=document.querySelector('[data-header]'); const menu=document.querySelector('[data-menu]'); const button=document.querySelector('[data-menu-toggle]');
