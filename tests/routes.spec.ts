@@ -38,6 +38,9 @@ test('main routes expose centralized SEO, Open Graph, Twitter card, and hreflang
 
     await expect(page).toHaveTitle(expected.title);
     await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', expected.description);
+    await expect(page.locator('link[rel="icon"][href="/favicon.ico"]')).toHaveAttribute('sizes', 'any');
+    await expect(page.locator('link[rel="icon"][href="/favicon.svg"]')).toHaveAttribute('type', 'image/svg+xml');
+    await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute('href', '/apple-touch-icon.png');
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', expectedCanonical);
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', expected.title);
     await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', expected.description);
@@ -73,6 +76,32 @@ test('branded Open Graph image exists as a 1200 by 630 PNG', () => {
   expect(image.subarray(1, 4).toString('ascii')).toBe('PNG');
   expect(image.readUInt32BE(16)).toBe(1200);
   expect(image.readUInt32BE(20)).toBe(630);
+});
+
+test('favicon and app icon assets are generated from vector source with expected sizes', () => {
+  const publicPath = path.join(process.cwd(), 'public');
+  const svg = readFileSync(path.join(publicPath, 'favicon.svg'), 'utf8');
+  expect(svg).toContain('<svg');
+  expect(svg).not.toMatch(/<image|base64|data:image/i);
+
+  for (const [filename, width, height] of [
+    ['favicon-16x16.png', 16, 16],
+    ['favicon-32x32.png', 32, 32],
+    ['apple-touch-icon.png', 180, 180],
+    ['icon-192.png', 192, 192],
+    ['icon-512.png', 512, 512],
+  ] as const) {
+    const image = readFileSync(path.join(publicPath, filename));
+    expect(image.subarray(1, 4).toString('ascii')).toBe('PNG');
+    expect(image.readUInt32BE(16)).toBe(width);
+    expect(image.readUInt32BE(20)).toBe(height);
+    expect(image[25]).toBe(6);
+  }
+
+  const ico = readFileSync(path.join(publicPath, 'favicon.ico'));
+  expect(ico.readUInt16LE(0)).toBe(0);
+  expect(ico.readUInt16LE(2)).toBe(1);
+  expect(ico.readUInt16LE(4)).toBe(2);
 });
 
 test('traditional Chinese home exposes a named main landmark', async ({ page }) => {
