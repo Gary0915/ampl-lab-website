@@ -12,6 +12,7 @@ import ResearchCapabilitySummary from '../components/ResearchCapabilitySummary.a
 import Pipeline from '../components/Pipeline.astro';
 import OfficialProfileLinks from '../components/OfficialProfileLinks.astro';
 import SelectedPublications from '../components/SelectedPublications.astro';
+import PublicationExplorer from '../components/PublicationExplorer.astro';
 import FacilityEquipmentGroups from '../components/FacilityEquipmentGroups.astro';
 import LabProducts from '../components/LabProducts.astro';
 import ProjectCollaborationSummary from '../components/ProjectCollaborationSummary.astro';
@@ -19,7 +20,7 @@ import { routes, type Route, labels, lab } from '../content/site';
 import { pageIntro, aboutCopy, joinCopy } from '../content/pages';
 import { pending } from '../content/pending';
 import { researchAreas } from '../content/research';
-import { publicationCopy } from '../content/publications';
+import { publicationCopy, recentJournalPublications } from '../content/publications';
 import { projectCopy } from '../content/projects';
 import { newsCategories } from '../content/news';
 
@@ -82,6 +83,7 @@ export function getStaticPaths() {
       <SectionHeading eyebrow="Research records" title="研究出版紀錄" description="精選論文與完整書目將以可核實的出版資訊整理呈現。" />
       <OfficialProfileLinks lang={lang} />
       <SelectedPublications lang={lang} variant="full" />
+      <PublicationExplorer lang={lang} publications={recentJournalPublications} />
       <p class="complete-records-note">{publicationCopy[lang].completeNote}</p>
     </>}
 

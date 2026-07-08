@@ -1,0 +1,33 @@
+---
+import type { PublicationRecord } from '../content/publications';
+import type { Locale } from '../content/site';
+
+interface Props {
+  publication: PublicationRecord;
+  lang: Locale;
+}
+
+const { publication, lang } = Astro.props;
+const tags = publication.tags[lang].slice(0, 3);
+const role = publication.professorRole?.[lang];
+---
+
+<article class="publication-row" data-year={publication.year} data-topics={tags.join('|')} tabindex="0">
+  <div class="publication-row__date">
+    <span>{publication.year}</span>
+    <time datetime={publication.date}>{publication.date}</time>
+  </div>
+  <div class="publication-row__body">
+    <h3>{publication.title}</h3>
+    <p class="publication-row__authors">{publication.authors}</p>
+    <p class="publication-row__journal">
+      <strong>{publication.journal}</strong>
+      {publication.citation && <span>{publication.citation}</span>}
+      {publication.indexStatus && <span class="publication-row__status">{publication.indexStatus}</span>}
+    </p>
+    {role && <p class="publication-row__role">{role}</p>}
+    <ul class="publication-row__tags" aria-label={lang === 'zh-Hant' ? '研究關聯標籤' : 'Research relevance tags'}>
+      {tags.map((tag) => <li>{tag}</li>)}
+    </ul>
+  </div>
+</article>
