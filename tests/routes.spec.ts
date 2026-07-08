@@ -1,4 +1,79 @@
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 import { expect, test } from '@playwright/test';
+import type { Locale } from '../src/content/site';
+import { getAbsoluteUrl, getRoutePath, seoConfig, seoPages, type SeoRoute } from '../src/content/seo';
+
+const seoRouteCases: Array<{ path: string; lang: Locale; route: SeoRoute }> = [
+  { path: '/', lang: 'zh-Hant', route: 'home' },
+  { path: '/about/', lang: 'zh-Hant', route: 'about' },
+  { path: '/research/', lang: 'zh-Hant', route: 'research' },
+  { path: '/projects/', lang: 'zh-Hant', route: 'projects' },
+  { path: '/publications/', lang: 'zh-Hant', route: 'publications' },
+  { path: '/facilities/', lang: 'zh-Hant', route: 'facilities' },
+  { path: '/members/', lang: 'zh-Hant', route: 'members' },
+  { path: '/join-us/', lang: 'zh-Hant', route: 'join-us' },
+  { path: '/contact/', lang: 'zh-Hant', route: 'contact' },
+  { path: '/news/', lang: 'zh-Hant', route: 'news' },
+  { path: '/en/', lang: 'en', route: 'home' },
+  { path: '/en/about/', lang: 'en', route: 'about' },
+  { path: '/en/research/', lang: 'en', route: 'research' },
+  { path: '/en/projects/', lang: 'en', route: 'projects' },
+  { path: '/en/publications/', lang: 'en', route: 'publications' },
+  { path: '/en/facilities/', lang: 'en', route: 'facilities' },
+  { path: '/en/members/', lang: 'en', route: 'members' },
+  { path: '/en/join-us/', lang: 'en', route: 'join-us' },
+  { path: '/en/contact/', lang: 'en', route: 'contact' },
+  { path: '/en/news/', lang: 'en', route: 'news' },
+];
+
+test('main routes expose centralized SEO, Open Graph, Twitter card, and hreflang metadata', async ({ page }) => {
+  for (const item of seoRouteCases) {
+    await page.goto(item.path);
+    const expected = seoPages[item.lang][item.route];
+    const expectedCanonical = getAbsoluteUrl(getRoutePath(item.route, item.lang));
+    const expectedOgImage = getAbsoluteUrl(seoConfig.defaultOgImagePath);
+    const expectedZhAlternate = getAbsoluteUrl(getRoutePath(item.route, 'zh-Hant'));
+    const expectedEnAlternate = getAbsoluteUrl(getRoutePath(item.route, 'en'));
+
+    await expect(page).toHaveTitle(expected.title);
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', expected.description);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', expectedCanonical);
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', expected.title);
+    await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', expected.description);
+    await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'website');
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content', expectedCanonical);
+    await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute('content', seoConfig.siteName);
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', expectedOgImage);
+    await expect(page.locator('meta[property="og:image:width"]')).toHaveAttribute('content', String(seoConfig.ogImageWidth));
+    await expect(page.locator('meta[property="og:image:height"]')).toHaveAttribute('content', String(seoConfig.ogImageHeight));
+    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute('content', seoConfig.ogImageAlt[item.lang]);
+    await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute('content', item.lang === 'zh-Hant' ? 'zh_TW' : 'en_US');
+    await expect(page.locator('meta[property="og:locale:alternate"]')).toHaveAttribute('content', item.lang === 'zh-Hant' ? 'en_US' : 'zh_TW');
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image');
+    await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute('content', expected.title);
+    await expect(page.locator('meta[name="twitter:description"]')).toHaveAttribute('content', expected.description);
+    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute('content', expectedOgImage);
+    await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute('content', seoConfig.ogImageAlt[item.lang]);
+    await expect(page.locator('link[rel="alternate"][hreflang="zh-Hant"]')).toHaveAttribute('href', expectedZhAlternate);
+    await expect(page.locator('link[rel="alternate"][hreflang="en"]')).toHaveAttribute('href', expectedEnAlternate);
+    await expect(page.locator('link[rel="alternate"][hreflang="x-default"]')).toHaveAttribute('href', expectedZhAlternate);
+
+    const headHtml = await page.locator('head').evaluate((head) => head.innerHTML);
+    for (const marker of ['[待提供]', '[待確認]', '[Pending]', '待提供：', '待確認：']) {
+      expect(headHtml).not.toContain(marker);
+    }
+  }
+});
+
+test('branded Open Graph image exists as a 1200 by 630 PNG', () => {
+  const ogImagePath = path.join(process.cwd(), 'public', 'og-image.png');
+  expect(existsSync(ogImagePath)).toBe(true);
+  const image = readFileSync(ogImagePath);
+  expect(image.subarray(1, 4).toString('ascii')).toBe('PNG');
+  expect(image.readUInt32BE(16)).toBe(1200);
+  expect(image.readUInt32BE(20)).toBe(630);
+});
 
 test('traditional Chinese home exposes a named main landmark', async ({ page }) => {
   await page.goto('/');

@@ -36,7 +36,7 @@ export function getStaticPaths() {
 }
 ---
 
-<BaseLayout title={labels[lang][page]} lang={lang}>
+<BaseLayout title={labels[lang][page]} lang={lang} route={page}>
   <PageHero eyebrow={`AMPL · ${labels.en[page]}`} title={intro.title} description={intro.description} secondary={page === 'about' ? lab.englishName : undefined} />
 
   <section class="page-content">
