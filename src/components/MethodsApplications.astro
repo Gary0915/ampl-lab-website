@@ -9,11 +9,13 @@ const zh = lang === 'zh-Hant';
 
 <div class="methods-applications">
   {methodsApplications[lang].map((item, index) => (
-    <article class="methods-row">
-      <span class="card-index">0{index + 1}</span>
-      <div>
-        <h3>{item.method}</h3>
-        <p>{item.scope}</p>
+    <article class="methods-row" data-method-row>
+      <div class="methods-row__method">
+        <span class="card-index">0{index + 1}</span>
+        <div>
+          <h3>{item.method}</h3>
+          <p>{item.scope}</p>
+        </div>
       </div>
       <div class="application-list">
         <span>{zh ? '應用面向' : 'Applications'}</span>

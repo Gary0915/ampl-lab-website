@@ -53,14 +53,14 @@ export const facilitiesCopy: Localized<{
   'zh-Hant': {
     eyebrow: '官方設備紀錄',
     title: '實驗室設備',
-    description: '依成大機械系官方教師頁公開設備清單整理，並依研究用途重新分組。未加入未確認照片、型號或規格。',
-    sourceNote: '設備名稱依官方教師頁整理；官方頁中明顯拼字錯誤已以公開展示可讀性為原則校正。',
+    description: '實驗室設備依模擬分析、熱處理製程、材料表徵、電化學感測與實驗製備用途分組呈現。',
+    sourceNote: '本頁設備與材料平台依成大機械系官方教師頁之公開資料整理。',
   },
   en: {
     eyebrow: 'Official equipment records',
     title: 'Laboratory Equipment',
-    description: 'Equipment is organized from the official NCKU faculty profile and grouped by research use. Unverified photographs, model numbers, and specifications are not added.',
-    sourceNote: 'Equipment names are based on the official faculty profile; obvious typographic errors are normalized for public presentation.',
+    description: 'Laboratory equipment is grouped by simulation, thermal processing, characterization, electrochemical sensing, and preparation use.',
+    sourceNote: 'The equipment and material platforms on this page are organized from publicly available information in the official NCKU faculty profile.',
   },
 };
 

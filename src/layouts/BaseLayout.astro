@@ -9,7 +9,7 @@ interface Props { title: string; lang: Locale; route?: SeoRoute }
 const { title, lang, route = 'home' } = Astro.props;
 ---
 <!doctype html><html lang={lang}><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><SEO lang={lang} route={route} title={title}/></head><body>
-<a class="skip" href="#content">Skip to content</a><Header lang={lang}/><main id="content"><slot/></main><Footer lang={lang}/>
+<a class="skip" href="#content">Skip to content</a><Header lang={lang} currentPath={Astro.url.pathname}/><main id="content" class="page-transition-content"><slot/></main><Footer lang={lang}/>
 <script>
   const header=document.querySelector('[data-header]'); const menu=document.querySelector('[data-menu]'); const button=document.querySelector('[data-menu-toggle]');
   const update=()=>header?.classList.toggle('is-scrolled',scrollY>12); update(); addEventListener('scroll',update,{passive:true});

@@ -251,6 +251,145 @@ test('mobile navigation opens accessibly', async ({ page }) => {
   await expect(page.locator('#mobile-navigation')).toBeVisible();
 });
 
+test('refinement language switch preserves the current localized route', async ({ page }) => {
+  const cases = [
+    ['/', '/en/'],
+    ['/research/', '/en/research/'],
+    ['/publications/', '/en/publications/'],
+    ['/facilities/', '/en/facilities/'],
+    ['/projects/', '/en/projects/'],
+    ['/join-us/', '/en/join-us/'],
+    ['/contact/', '/en/contact/'],
+    ['/en/', '/'],
+    ['/en/research/', '/research/'],
+    ['/en/publications/', '/publications/'],
+    ['/en/facilities/', '/facilities/'],
+    ['/en/projects/', '/projects/'],
+    ['/en/join-us/', '/join-us/'],
+    ['/en/contact/', '/contact/'],
+  ] as const;
+
+  for (const [pathname, alternate] of cases) {
+    await page.goto(pathname);
+    await expect(page.locator('[data-locale-switch]').first(), pathname).toHaveAttribute('href', alternate);
+  }
+});
+
+test('refinement navigation separates the desktop Contact CTA and exposes one active route', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+
+  for (const [pathname, activeLabel] of [
+    ['/about/', '關於實驗室'],
+    ['/research/', '研究領域'],
+    ['/projects/', '計畫合作'],
+    ['/publications/', '出版品'],
+    ['/facilities/', '實驗設施'],
+    ['/members/', '成員'],
+    ['/join-us/', '加入我們'],
+    ['/en/publications/', 'Publications'],
+  ] as const) {
+    await page.goto(pathname);
+    await expect(page.locator('[data-desktop-nav]')).not.toContainText(/聯絡資訊|Contact/);
+    await expect(page.locator('[data-contact-cta]')).toHaveCount(1);
+    await expect(page.locator('[data-desktop-nav] [aria-current="page"]')).toHaveCount(1);
+    await expect(page.locator('[data-desktop-nav] [aria-current="page"]')).toHaveText(activeLabel);
+  }
+
+  await page.goto('/contact/');
+  await expect(page.locator('[data-desktop-nav] [aria-current="page"]')).toHaveCount(0);
+  await expect(page.locator('[data-contact-cta]')).toHaveAttribute('aria-current', 'page');
+});
+
+test('refinement mobile navigation keeps Contact, active state, and route-preserving language switch', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/en/research/');
+  await page.locator('[data-menu-toggle]').click();
+
+  await expect(page.locator('[data-menu] [data-mobile-nav-item="contact"]')).toHaveText('Contact');
+  await expect(page.locator('[data-menu] [aria-current="page"]')).toHaveCount(1);
+  await expect(page.locator('[data-menu] [aria-current="page"]')).toHaveText('Research');
+  await expect(page.locator('[data-menu] [data-locale-switch]')).toHaveAttribute('href', '/research/');
+});
+
+test('refinement public pages omit internal maintenance language', async ({ page }) => {
+  const forbidden = [
+    '建議教授確認後',
+    '資料整理中',
+    '待提供',
+    '待確認',
+    'Pending',
+    'requires professor confirmation',
+    'pending verification',
+  ];
+
+  for (const pathname of [
+    '/', '/about/', '/research/', '/projects/', '/members/', '/publications/', '/facilities/', '/news/', '/join-us/', '/contact/',
+    '/en/', '/en/about/', '/en/research/', '/en/projects/', '/en/members/', '/en/publications/', '/en/facilities/', '/en/news/', '/en/join-us/', '/en/contact/',
+  ]) {
+    await page.goto(pathname);
+    const content = await page.locator('main').innerText();
+    for (const phrase of forbidden) expect(content, `${pathname} exposes ${phrase}`).not.toContain(phrase);
+  }
+
+  await page.goto('/members/');
+  await expect(page.locator('.pi-card')).toHaveCount(1);
+  await expect(page.locator('.pending-card')).toHaveCount(0);
+
+  await page.goto('/news/');
+  await expect(page.locator('[data-news-empty-state]')).toHaveCount(1);
+  await expect(page.locator('.pending-card')).toHaveCount(0);
+});
+
+test('refinement About presents one consolidated professor profile with verified detail groups', async ({ page }) => {
+  for (const pathname of ['/about/', '/en/about/']) {
+    await page.goto(pathname);
+    const profile = page.locator('[data-professor-profile]');
+    await expect(profile).toHaveCount(1);
+    await expect(profile.locator('[data-profile-group="education"]')).toHaveCount(1);
+    await expect(profile.locator('[data-profile-group="experience"]')).toHaveCount(1);
+    await expect(profile.locator('[data-profile-group="expertise"]')).toHaveCount(1);
+    await expect(page.locator('main .pi-card')).toHaveCount(0);
+  }
+});
+
+test('refinement interior pages use editorial and compact hero density variants', async ({ page }) => {
+  for (const pathname of ['/about/', '/research/', '/facilities/', '/en/about/', '/en/research/', '/en/facilities/']) {
+    await page.goto(pathname);
+    await expect(page.locator('[data-hero-density]')).toHaveAttribute('data-hero-density', 'editorial');
+  }
+
+  for (const pathname of ['/projects/', '/publications/', '/members/', '/news/', '/join-us/', '/contact/', '/en/projects/', '/en/contact/']) {
+    await page.goto(pathname);
+    await expect(page.locator('[data-hero-density]')).toHaveAttribute('data-hero-density', 'compact');
+  }
+});
+
+test('refinement Research keeps its records while using capability matrix and editorial method rows', async ({ page }) => {
+  for (const pathname of ['/research/', '/en/research/']) {
+    await page.goto(pathname);
+    await expect(page.locator('.research-card')).toHaveCount(6);
+    await expect(page.locator('[data-capability-item]')).toHaveCount(6);
+    await expect(page.locator('[data-method-row]')).toHaveCount(3);
+    await expect(page.locator('.pipeline li')).toHaveCount(5);
+  }
+});
+
+test('refinement native cross-document transition is progressive and reduced-motion aware', () => {
+  const layout = readFileSync(path.join(process.cwd(), 'src', 'layouts', 'BaseLayout.astro'), 'utf8');
+  const css = readFileSync(path.join(process.cwd(), 'src', 'styles', 'global.css'), 'utf8');
+
+  expect(layout).toContain('page-transition-content');
+  expect(layout).not.toContain('ClientRouter');
+  expect(css).toContain('@view-transition');
+  expect(css).toContain('view-transition-name:page-content');
+  expect(css).toContain('::view-transition-old(page-content)');
+  expect(css).toContain('::view-transition-new(page-content)');
+  expect(css).toContain('@media(prefers-reduced-motion:reduce)');
+  const transitionAnimations = [...css.matchAll(/@keyframes page-transition-(?:out|in)\{[^}]*\}/g)].map((match) => match[0]).join('');
+  expect(transitionAnimations).not.toContain('scale(');
+  expect(transitionAnimations).not.toContain('blur(');
+});
+
 test('Research cards use a calm responsive grid and retain at most three tags', async ({ page }) => {
   for (const [width, expectedColumns] of [[1440, 3], [1280, 2], [1024, 2], [768, 2], [430, 1], [390, 1]] as const) {
     await page.setViewportSize({ width, height: 900 });
@@ -285,7 +424,7 @@ test('Research capability summary stays localized and responsive', async ({ page
   await expect(page.locator('main')).toContainText('Agricultural, fishery, and biomass resources');
   await expect(page.locator('main')).not.toContainText('研究能力架構');
 
-  for (const [width, expectedColumns] of [[1440, 3], [1280, 2], [1024, 2], [768, 2], [430, 1], [390, 1]] as const) {
+  for (const [width, expectedColumns] of [[1440, 3], [1280, 3], [1024, 2], [768, 2], [430, 1], [390, 1]] as const) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/research');
     const columns = await page.locator('.capability-summary').evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length);
@@ -345,6 +484,22 @@ test('visual refinement target pages have no horizontal overflow at QA widths', 
       await page.goto(path);
       const sizes = await page.locator('html').evaluate((element) => ({ scrollWidth: element.scrollWidth, clientWidth: element.clientWidth }));
       expect(sizes.scrollWidth, `${path} at ${width}px`).toBeLessThanOrEqual(sizes.clientWidth);
+    }
+  }
+});
+
+test('navigation and editorial refinement routes have no horizontal overflow at all QA widths', async ({ page }) => {
+  const paths = [
+    '/', '/about/', '/research/', '/projects/', '/publications/', '/facilities/', '/members/', '/join-us/', '/contact/',
+    '/en/about/', '/en/research/', '/en/contact/',
+  ] as const;
+
+  for (const width of [1440, 1280, 1024, 768, 430, 390, 360] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const pathname of paths) {
+      await page.goto(pathname);
+      const sizes = await page.locator('html').evaluate((element) => ({ scrollWidth: element.scrollWidth, clientWidth: element.clientWidth }));
+      expect(sizes.scrollWidth, `${pathname} at ${width}px`).toBeLessThanOrEqual(sizes.clientWidth);
     }
   }
 });
