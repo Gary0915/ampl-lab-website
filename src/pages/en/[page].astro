@@ -5,8 +5,6 @@ import SectionHeading from '../../components/SectionHeading.astro';
 import PrincipalInvestigatorCard from '../../components/PrincipalInvestigatorCard.astro';
 import ProfessorProfile from '../../components/ProfessorProfile.astro';
 import MethodsApplications from '../../components/MethodsApplications.astro';
-import PendingInformationCard from '../../components/PendingInformationCard.astro';
-import NewsCategoryCard from '../../components/NewsCategoryCard.astro';
 import ResearchCard from '../../components/ResearchCard.astro';
 import ResearchCapabilitySummary from '../../components/ResearchCapabilitySummary.astro';
 import Pipeline from '../../components/Pipeline.astro';
@@ -16,13 +14,11 @@ import PublicationExplorer from '../../components/PublicationExplorer.astro';
 import FacilityEquipmentGroups from '../../components/FacilityEquipmentGroups.astro';
 import LabProducts from '../../components/LabProducts.astro';
 import ProjectCollaborationSummary from '../../components/ProjectCollaborationSummary.astro';
-import { routes, type Route, labels, lab } from '../../content/site';
+import { routes, editorialRoutes, type Route, labels, lab } from '../../content/site';
 import { pageIntro, aboutCopy, joinCopy } from '../../content/pages';
-import { pending } from '../../content/pending';
 import { researchAreas } from '../../content/research';
 import { publicationCopy, recentJournalPublications } from '../../content/publications';
 import { projectCopy } from '../../content/projects';
-import { newsCategories } from '../../content/news';
 
 const lang = 'en' as const;
 const page = Astro.params.page as Route;
@@ -30,6 +26,7 @@ if (!routes.includes(page)) return new Response(null, { status: 404 });
 const intro = pageIntro[lang][page];
 const about = aboutCopy[lang];
 const join = joinCopy[lang];
+const heroDensity = editorialRoutes.includes(page as (typeof editorialRoutes)[number]) ? 'editorial' : 'compact';
 
 export function getStaticPaths() {
   return routes.map((page) => ({ params: { page } }));
@@ -37,13 +34,11 @@ export function getStaticPaths() {
 ---
 
 <BaseLayout title={labels[lang][page]} lang={lang} route={page}>
-  <PageHero eyebrow={`AMPL · ${labels[lang][page]}`} title={intro.title} description={intro.description} secondary={page === 'about' ? lab.chineseName : undefined} />
+  <PageHero eyebrow={`AMPL · ${labels[lang][page]}`} title={intro.title} description={intro.description} secondary={page === 'about' ? lab.chineseName : undefined} density={heroDensity} />
 
   <section class="page-content">
     {page === 'about' && <>
       <SectionHeading eyebrow="Lab profile" title="About the lab" description={about.profile} />
-      <PrincipalInvestigatorCard lang={lang} />
-      <SectionHeading eyebrow="Professor profile" title="Prof. Shih-Chen Shi" description="Education, selected experience, and research expertise are compiled from the official faculty profile of the NCKU Department of Mechanical Engineering." />
       <ProfessorProfile lang={lang} />
       <div class="prose-grid">
         <article><h2>Research philosophy</h2><p>{about.philosophy}</p></article>
@@ -74,9 +69,8 @@ export function getStaticPaths() {
     </>}
 
     {page === 'members' && <>
-      <SectionHeading eyebrow="Principal investigator" title="Research team" description="Team information will be formally published with verified research topics and contact details." />
+      <SectionHeading eyebrow="Principal investigator" title="Research team" description="This page presents publicly verified research team information." />
       <PrincipalInvestigatorCard lang={lang} />
-      <div class="pending-grid"><PendingInformationCard lang={lang} item={pending.members} /><PendingInformationCard lang={lang} item={pending.alumni} /></div>
     </>}
 
     {page === 'publications' && <>
@@ -93,9 +87,8 @@ export function getStaticPaths() {
     </>}
 
     {page === 'news' && <>
-      <SectionHeading eyebrow="Formal updates" title="Laboratory news" description="This page provides a formal surface for updates that have been confirmed by the laboratory." />
-      <div class="news-grid">{newsCategories[lang].map((item, index) => <NewsCategoryCard {...item} {index} />)}</div>
-      <PendingInformationCard lang={lang} item={pending.news} />
+      <SectionHeading eyebrow="AMPL updates" title="Laboratory news" description="Laboratory announcements, research publications, and academic activities are published on this page." />
+      <section class="public-empty-state" data-news-empty-state><span class="eyebrow">News</span><h2>No public updates at this time</h2><p>Laboratory announcements and research updates are published here.</p></section>
     </>}
 
     {page === 'join-us' && <>

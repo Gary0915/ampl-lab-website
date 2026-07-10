@@ -2,7 +2,8 @@ export type Locale = 'zh-Hant' | 'en';
 export type Localized<T = string> = Record<Locale, T>;
 export const routes = ['about', 'research', 'projects', 'members', 'publications', 'facilities', 'news', 'join-us', 'contact'] as const;
 export type Route = (typeof routes)[number];
-export const primaryRoutes = ['about', 'research', 'projects', 'publications', 'facilities', 'members', 'join-us', 'contact'] as const satisfies readonly Route[];
+export const primaryRoutes = ['about', 'research', 'projects', 'publications', 'facilities', 'members', 'join-us'] as const satisfies readonly Route[];
+export const editorialRoutes = ['about', 'research', 'facilities'] as const satisfies readonly Route[];
 export const lab = {
   abbreviation: 'AMPL', chineseName: '尖端材料及製程實驗室', englishName: 'Advanced Material and Processing Lab',
   professor: { 'zh-Hant': '施士塵教授', en: 'Prof. Shih-Chen Shi' },

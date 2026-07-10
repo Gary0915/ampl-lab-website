@@ -5,8 +5,6 @@ import SectionHeading from '../components/SectionHeading.astro';
 import PrincipalInvestigatorCard from '../components/PrincipalInvestigatorCard.astro';
 import ProfessorProfile from '../components/ProfessorProfile.astro';
 import MethodsApplications from '../components/MethodsApplications.astro';
-import PendingInformationCard from '../components/PendingInformationCard.astro';
-import NewsCategoryCard from '../components/NewsCategoryCard.astro';
 import ResearchCard from '../components/ResearchCard.astro';
 import ResearchCapabilitySummary from '../components/ResearchCapabilitySummary.astro';
 import Pipeline from '../components/Pipeline.astro';
@@ -16,13 +14,11 @@ import PublicationExplorer from '../components/PublicationExplorer.astro';
 import FacilityEquipmentGroups from '../components/FacilityEquipmentGroups.astro';
 import LabProducts from '../components/LabProducts.astro';
 import ProjectCollaborationSummary from '../components/ProjectCollaborationSummary.astro';
-import { routes, type Route, labels, lab } from '../content/site';
+import { routes, editorialRoutes, type Route, labels, lab } from '../content/site';
 import { pageIntro, aboutCopy, joinCopy } from '../content/pages';
-import { pending } from '../content/pending';
 import { researchAreas } from '../content/research';
 import { publicationCopy, recentJournalPublications } from '../content/publications';
 import { projectCopy } from '../content/projects';
-import { newsCategories } from '../content/news';
 
 const lang = 'zh-Hant' as const;
 const page = Astro.params.page as Route;
@@ -30,6 +26,7 @@ if (!routes.includes(page)) return new Response(null, { status: 404 });
 const intro = pageIntro[lang][page];
 const about = aboutCopy[lang];
 const join = joinCopy[lang];
+const heroDensity = editorialRoutes.includes(page as (typeof editorialRoutes)[number]) ? 'editorial' : 'compact';
 
 export function getStaticPaths() {
   return routes.map((page) => ({ params: { page } }));
@@ -37,13 +34,11 @@ export function getStaticPaths() {
 ---
 
 <BaseLayout title={labels[lang][page]} lang={lang} route={page}>
-  <PageHero eyebrow={`AMPL · ${labels.en[page]}`} title={intro.title} description={intro.description} secondary={page === 'about' ? lab.englishName : undefined} />
+  <PageHero eyebrow={`AMPL · ${labels.en[page]}`} title={intro.title} description={intro.description} secondary={page === 'about' ? lab.englishName : undefined} density={heroDensity} />
 
   <section class="page-content">
     {page === 'about' && <>
       <SectionHeading eyebrow="Lab profile" title="實驗室簡介" description={about.profile} />
-      <PrincipalInvestigatorCard lang={lang} />
-      <SectionHeading eyebrow="Professor profile" title="施士塵教授" description="學歷、簡要經歷與研究專長均依國立成功大學機械工程學系官方教師頁所列資料整理。" />
       <ProfessorProfile lang={lang} />
       <div class="prose-grid">
         <article><h2>研究理念</h2><p>{about.philosophy}</p></article>
@@ -74,9 +69,8 @@ export function getStaticPaths() {
     </>}
 
     {page === 'members' && <>
-      <SectionHeading eyebrow="Principal investigator" title="研究團隊" description="實驗室成員資訊將以已確認的研究主題與聯絡資料正式發布。" />
+      <SectionHeading eyebrow="Principal investigator" title="研究團隊" description="本頁呈現已公開確認之研究團隊資訊。" />
       <PrincipalInvestigatorCard lang={lang} />
-      <div class="pending-grid"><PendingInformationCard lang={lang} item={pending.members} /><PendingInformationCard lang={lang} item={pending.alumni} /></div>
     </>}
 
     {page === 'publications' && <>
@@ -93,9 +87,8 @@ export function getStaticPaths() {
     </>}
 
     {page === 'news' && <>
-      <SectionHeading eyebrow="Formal updates" title="實驗室消息" description="此頁保留正式更新的發布框架，僅在資訊經確認後刊載。" />
-      <div class="news-grid">{newsCategories[lang].map((item, index) => <NewsCategoryCard {...item} {index} />)}</div>
-      <PendingInformationCard lang={lang} item={pending.news} />
+      <SectionHeading eyebrow="AMPL updates" title="實驗室消息" description="實驗室公告、研究出版與學術活動統一刊載於此頁。" />
+      <section class="public-empty-state" data-news-empty-state><span class="eyebrow">News</span><h2>目前尚無公開消息</h2><p>最新實驗室公告與研究消息將統一刊載於此頁。</p></section>
     </>}
 
     {page === 'join-us' && <>

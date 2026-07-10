@@ -11,6 +11,8 @@ const captures = [
   ['/projects', 'projects-mobile', { width: 390, height: 844 }],
   ['/en/projects', 'projects-english-desktop', { width: 1280, height: 1000 }],
   ['/about', 'about-professor-desktop', { width: 1280, height: 1000 }],
+  ['/about', 'about-mobile', { width: 390, height: 844 }],
+  ['/en/about', 'about-english-desktop', { width: 1280, height: 1000 }],
   ['/publications', 'publications-desktop', { width: 1440, height: 1600 }],
   ['/publications', 'publications-mobile', { width: 390, height: 1600 }],
   ['/en/publications', 'publications-english-desktop', { width: 1440, height: 1600 }],
@@ -19,6 +21,7 @@ const captures = [
   ['/en/facilities', 'facilities-english-desktop', { width: 1280, height: 1000 }],
   ['/contact', 'contact-desktop', { width: 1280, height: 1000 }],
   ['/', 'home-mobile', { width: 390, height: 844 }],
+  ['/members', 'members-desktop', { width: 1280, height: 1000 }],
   ['/members', 'members-mobile', { width: 390, height: 844 }],
   ['/contact', 'contact-mobile', { width: 390, height: 844 }],
 ] as const;
@@ -28,6 +31,7 @@ for (const [path, name, viewport] of captures) {
     await page.setViewportSize(viewport);
     if (name.startsWith('research')) await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(path);
+    await page.addStyleTag({ content: 'astro-dev-toolbar{display:none!important}' });
     await page.screenshot({ path: `artifacts/qa/${name}.png`, fullPage: true });
   });
 }

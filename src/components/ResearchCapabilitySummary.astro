@@ -12,7 +12,7 @@ const capabilities = researchCapabilities[lang];
 
 <ul class="capability-summary" data-reveal>
   {capabilities.map((item, index) => (
-    <li tabindex="0" aria-label={`0${index + 1}. ${item.title}`} style={`--cap-delay:${index * 70}ms`}>
+    <li data-capability-item tabindex="0" aria-label={`0${index + 1}. ${item.title}`} style={`--cap-delay:${index * 70}ms`}>
       <span class="card-index">0{index + 1}</span>
       <h3>{item.title}</h3>
       <p>{item.description}</p>

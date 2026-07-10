@@ -4,20 +4,38 @@ import { lab, type Locale } from '../content/site';
 interface Props { lang: Locale }
 const { lang } = Astro.props;
 const zh = lang === 'zh-Hant';
-const cards = [
-  { title: zh ? '學歷' : 'Education', items: lab.education[lang] },
-  { title: zh ? '簡要經歷' : 'Selected Experience', items: lab.selectedExperience[lang] },
-  { title: zh ? '研究專長' : 'Research Expertise', items: lab.researchExpertise[lang] },
+const groups = [
+  { key: 'education', title: zh ? '學歷' : 'Education', items: lab.education[lang] },
+  { key: 'experience', title: zh ? '簡要經歷' : 'Selected Experience', items: lab.selectedExperience[lang] },
+  { key: 'expertise', title: zh ? '研究專長' : 'Research Expertise', items: lab.researchExpertise[lang] },
 ];
+const summary = zh
+  ? '研究聚焦綠色合成、循環經濟、奈米與生物高分子複合材料、表面工程、磨潤，以及模擬輔助的材料與製程設計。'
+  : 'Research interests include green synthesis, circular economy, nano and biopolymer composites, surface engineering, tribology, and simulation-assisted materials and process design.';
 ---
 
-<div class="profile-grid">
-  {cards.map((card) => (
-    <article class="profile-card">
-      <h3>{card.title}</h3>
-      <ul>
-        {card.items.map((item) => <li>{item}</li>)}
-      </ul>
-    </article>
-  ))}
-</div>
+<section class="professor-profile" data-professor-profile data-reveal>
+  <div class="professor-overview">
+    <div class="pi-monogram" aria-hidden="true">SS</div>
+    <div class="professor-identity">
+      <span class="eyebrow">{zh ? '主持教授' : 'Principal Investigator'}</span>
+      <h2>{lab.professor[lang]}</h2>
+      <p class="professor-secondary-name">{zh ? lab.professor.en : lab.professor['zh-Hant']}</p>
+      <p class="pi-affiliation">{lab.department[lang]}</p>
+      <p>{summary}</p>
+    </div>
+    <nav class="professor-links" aria-label={zh ? '教授聯絡與官方連結' : 'Professor contact and official profiles'}>
+      <a href={`mailto:${lab.email}`}>{lab.email}</a>
+      <a href={lab.facultyProfileUrl} target="_blank" rel="noreferrer">{zh ? '成大官方教師頁' : 'Official NCKU Faculty Profile'} <span aria-hidden="true">↗</span></a>
+      <a href={lab.personalWebsiteUrl} target="_blank" rel="noreferrer">{zh ? '教授個人網站' : 'Professor Website'} <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <div class="professor-details">
+    {groups.map((group) => (
+      <section class="profile-group" data-profile-group={group.key}>
+        <h3>{group.title}</h3>
+        <ul>{group.items.map((item) => <li>{item}</li>)}</ul>
+      </section>
+    ))}
+  </div>
+</section>
